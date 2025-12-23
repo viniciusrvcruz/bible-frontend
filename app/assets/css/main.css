@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@plugin "daisyui" {
+  themes: all;
+}
+
+.p-popover {
+  border: var(--border);
+  border-radius: var(--radius-box);
+  background-color: var(--color-base-200);
+}
+.p-popover::before,
+.p-popover::after {
+  display: none !important;
+}
