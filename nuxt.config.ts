@@ -14,6 +14,7 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/icon',
     '@primevue/nuxt-module',
+    '@nuxtjs/color-mode',
   ],
 
   icon: {
@@ -26,5 +27,12 @@ export default defineNuxtConfig({
         preset: Aura
       }
     }
-  }
+  },
+
+  colorMode: {
+    preference: 'system',
+    fallback: 'light',
+    storage: 'cookie',
+    dataValue: 'theme'
+  },
 })
