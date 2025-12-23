@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@nuxt/icon": "^2.1.1",
+    "@nuxtjs/color-mode": "^4.0.0",
     "@primeuix/themes": "^2.0.2",
     "@tailwindcss/vite": "^4.1.18",
     "daisyui": "^5.5.14",

@@ -16,6 +16,7 @@ const ICON_MAP = {
   menu: 'lucide:menu',
   user: 'lucide:user',
   book_marked: 'lucide:book-marked',
+  check: 'lucide:check',
 } as const
 
 </script>
