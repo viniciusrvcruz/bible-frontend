@@ -1,5 +1,6 @@
 import tailwindcss from '@tailwindcss/vite';
 import Aura from '@primeuix/themes/aura';
+import { env } from './app/utils/env';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -16,6 +17,12 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
     '@nuxtjs/color-mode',
   ],
+
+  runtimeConfig: {
+    public: {
+      apiBaseUrl: env.NUXT_PUBLIC_API_BASE_URL,
+    },
+  },
 
   icon: {
     componentName: 'NuxtIcon'

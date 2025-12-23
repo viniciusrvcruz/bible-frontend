@@ -8,3 +8,8 @@ services:
       - 3000:3000
     volumes:
       - ./:/app
+    networks:
+      - bible_network
+
+networks:
+  bible_network:

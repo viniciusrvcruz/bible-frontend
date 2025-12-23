@@ -38,12 +38,12 @@ const themeSelectorPopoverRef = ref()
 
         <ul class="menu menu-horizontal gap-2 items-center">
           <li>
-            <button class="p-2">
+            <button v-tooltip.bottom="'Ajuda'" class="p-2">
               <Icon icon="circle_question" :size="22" />
             </button>
           </li>
           <li>
-            <button class="p-2" @click="themeSelectorPopoverRef.toggle">
+            <button v-tooltip.bottom="'Temas'" class="p-2" @click="themeSelectorPopoverRef.toggle">
               <Icon icon="palette" :size="22" />
             </button>
           </li>
