@@ -4,6 +4,26 @@
   themes: all;
 }
 
+:root {
+  --h-header: 4rem
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@utility h-header {
+  height: var(--h-header);
+}
+
+@utility top-header {
+  top: var(--h-header);
+}
+
+@utility h-screen-header {
+  height: calc(100dvh - var(--h-header));
+}
+
 .p-popover {
   border: var(--border);
   border-radius: var(--radius-box);

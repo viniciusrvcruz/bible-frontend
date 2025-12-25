@@ -5,11 +5,11 @@ const themeSelectorPopoverRef = ref()
 </script>
 
 <template>
-  <div class="drawer">
+  <div class="drawer sticky top-0 z-1">
     <input id="drawer" type="checkbox" class="drawer-toggle" />
 
     <div class="drawer-content flex flex-col">
-      <div class="navbar bg-base-300 w-full justify-between items-center py-0 lg:px-10">
+      <div class="navbar h-header bg-base-300 w-full justify-between items-center py-0 lg:px-10">
         <div class="flex-none lg:hidden">
           <label for="drawer" aria-label="open sidebar" class="btn btn-ghost">
             <Icon icon="menu" :size="25" />
