@@ -23,6 +23,7 @@ const ICON_MAP = {
   letter_case: 'tabler:letter-case',
   globe: 'lucide:globe',
   search: 'lucide:search',
+  close: 'lucide:x',
 } as const
 
 </script>

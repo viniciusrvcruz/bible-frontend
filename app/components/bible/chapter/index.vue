@@ -27,7 +27,7 @@
       </div>
 
       <div class="px-10">
-        <h1 class="text-xl font-bold text-center">
+        <h1 class="text-xl font-bold text-center text-base-content/40 mt-2">
           Gênesis
         </h1>
         <h2 class="text-7xl font-bold text-center mb-10">
@@ -77,6 +77,8 @@
       <button class="btn btn-xl btn-circle mb-15 ms-5 lg:mb-20 lg:ms-10 pointer-events-auto">
         <Icon icon="chevron_left" />
       </button>
+
+      <label for="select_verse_modal" class="btn pointer-events-auto">open modal</label>
 
       <button class="btn btn-xl btn-circle mb-15 me-5 lg:mb-20 lg:me-10 pointer-events-auto">
         <Icon icon="chevron_right" />
