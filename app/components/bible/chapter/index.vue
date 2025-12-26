@@ -66,6 +66,12 @@
             Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
             Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
             Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
+            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
+            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
+            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
+            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
+            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
+            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
             <p id="verse20">Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.</p>
             Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
             Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
@@ -74,13 +80,13 @@
     </div>
 
     <div class="flex justify-between sticky bottom-0 w-full pointer-events-none">
-      <button class="btn btn-xl btn-circle mb-15 ms-5 lg:mb-20 lg:ms-10 pointer-events-auto">
+      <button class="btn btn-xl btn-circle mb-15 ms-5 border-2 border-base-300 shadow-sm pointer-events-auto lg:mb-20 lg:ms-10">
         <Icon icon="chevron_left" />
       </button>
 
-      <label for="select_verse_modal" class="btn pointer-events-auto">open modal</label>
+      <label for="select_verse_modal" class="btn pointer-events-auto lg:hidden">open modal</label>
 
-      <button class="btn btn-xl btn-circle mb-15 me-5 lg:mb-20 lg:me-10 pointer-events-auto">
+      <button class="btn btn-xl btn-circle mb-15 me-5 border-2 border-base-300 shadow-sm pointer-events-auto lg:mb-20 lg:me-10">
         <Icon icon="chevron_right" />
       </button>
     </div>
