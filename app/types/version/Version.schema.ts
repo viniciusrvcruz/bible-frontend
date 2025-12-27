@@ -8,3 +8,4 @@ export const VersionSchema = z.object({
   chapters_count: z.int().optional(),
   verses_count: z.int().optional(),
 })
+

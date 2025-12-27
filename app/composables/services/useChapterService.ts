@@ -1,4 +1,4 @@
-import type { BookNameEnum } from "~/types/enums/Book.enum"
+import type { BookNameEnum } from '~/types/book/Book.enum'
 
 export function useChapterService() {
   const api = useApi()

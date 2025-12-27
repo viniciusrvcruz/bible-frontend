@@ -1,4 +1,4 @@
-import type { Version } from "~/types/Version.type"
+import type { Version } from '~/types/version/Version.type'
 
 export const useVersionStore = defineStore('version', () => {
 

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { BookNameEnum } from '../enums/Book.enum'
+import { BookNameEnum } from '../book/Book.enum'
 
 export const VerseSchema = z.object({
   book: z.enum(BookNameEnum),

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { BookNameEnum } from '~/types/enums/Book.enum'
-import type { ChapterSelection } from '~/types/Chapter.type'
-import type { VerseSelection } from '~/types/Verse.type'
+import type { BookNameEnum } from '~/types/book/Book.enum'
+import type { ChapterSelection } from '~/types/chapter/Chapter.type'
+import type { VerseSelection } from '~/types/verse/Verse.type'
 
 interface ChapterVerses {
   chapter: number

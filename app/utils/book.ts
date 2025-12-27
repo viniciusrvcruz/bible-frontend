@@ -1,5 +1,5 @@
-import type { Book } from "~/types/Book.type";
-import { BookNameEnum } from "~/types/enums/Book.enum";
+import type { Book } from '~/types/book/Book.type'
+import { BookNameEnum } from '~/types/book/Book.enum'
 
 export const BOOKS_INFO: Record<BookNameEnum, Book> = {
   [BookNameEnum.GEN]: { name: 'Gênesis', chapters: 50 },
