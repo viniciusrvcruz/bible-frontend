@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import type { Chapter } from '~/types/chapter/Chapter.type'
+
+const props = defineProps<{
+  chapter: Chapter
+}>()
 
 </script>
 
@@ -33,48 +38,9 @@
         <h2 class="text-7xl font-bold text-center mb-10">
           12
         </h2>
-        Chapter text
-        Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            <p id="verse20">Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.</p>
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
-            Chapter 1 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum laborum provident modi quisquam error assumenda veritatis deleniti repellendus sed sequi officiis esse ipsam a, itaque doloribus unde iste blanditiis libero.
+        <div v-for="verse in chapter.verses" :key="verse.id">
+          {{ verse.text }}
+        </div>
       </div>
 
     </div>

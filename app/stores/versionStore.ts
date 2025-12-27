@@ -23,10 +23,15 @@ export const useVersionStore = defineStore('version', () => {
     currentVersionName.value = version?.name ?? null
   }
 
+  const getVersionByName = (name: string) => {
+    return versions.value.find(version => version.name === name) ?? null
+  }
+
   return {
     versions,
     currentVersion,
     setVersions,
     setCurrentVersion,
+    getVersionByName,
   }
 })

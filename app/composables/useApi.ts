@@ -5,9 +5,9 @@ type RequestOptions = Omit<FetchOptions, 'method' | 'body' | 'query'>
 export const useApi = () => {
   const config = useRuntimeConfig()
 
-  const apiBaseURL = import.meta.client
-    ? config.public.apiBaseUrl
-    : config.public.apiBaseUrServer
+  const apiBaseURL = import.meta.server
+    ? config.apiBaseUrl
+    : config.public.apiBaseUrl
 
   const baseURL = `${apiBaseURL}/api/`
 
@@ -29,8 +29,8 @@ export const useApi = () => {
           ? { query: data }
           : {}
         : data
-        ? { body: data }
-        : {}),
+          ? { body: data }
+          : {}),
       ...options,
     })
   }
