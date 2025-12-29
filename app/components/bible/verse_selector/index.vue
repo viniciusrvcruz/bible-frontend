@@ -181,11 +181,11 @@ defineExpose({
           {{ selectedBookInfo.name }}
         </button>
       </div>
-      <div class="grid grid-cols-5 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-5 xl:grid-cols-6">
+      <div class="flex flex-wrap gap-2">
         <button
           v-for="chapter in selectedBookInfo.chapters"
           :key="chapter"
-          class="btn btn-ghost bg-base-200 aspect-square"
+          class="btn btn-ghost bg-base-200 aspect-square w-14"
           @click="selectChapter(chapter)"
         >
           {{ chapter }}
@@ -204,11 +204,11 @@ defineExpose({
           {{ selectedBookInfo.name }} {{ selectedChapter }}
         </button>
       </div>
-      <div class="grid grid-cols-5 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-5 xl:grid-cols-6">
+      <div class="flex flex-wrap gap-2">
         <button
           v-for="verse in selectedChapterVerses"
           :key="verse"
-          class="btn btn-ghost bg-base-200 aspect-square"
+          class="btn btn-ghost bg-base-200 aspect-square w-14"
           @click="selectVerseNumber(verse)"
         >
           {{ verse }}
