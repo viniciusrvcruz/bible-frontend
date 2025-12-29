@@ -1,7 +1,17 @@
 <script setup lang="ts">
+const route = useRoute()
 
 const themeSelectorPopoverRef = ref()
 
+const closeDrawer = () => {
+  document.getElementById('drawer')?.click()
+}
+
+const bibleLink = computed(() =>
+  route.path.startsWith('/bible/')
+    ? route.path
+    : '/bible'
+)
 </script>
 
 <template>
@@ -21,10 +31,10 @@ const themeSelectorPopoverRef = ref()
 
           <ul class="menu menu-horizontal gap-2 ms-5">
             <li>
-              <a>
+              <RouterLink :to="bibleLink">
                 <Icon icon="book_open" :size="20" />
                 Bíblia
-              </a>
+              </RouterLink>
             </li>
             <li>
               <a>
@@ -59,10 +69,10 @@ const themeSelectorPopoverRef = ref()
       <label for="drawer" aria-label="close sidebar" class="drawer-overlay" />
       <ul class="menu bg-base-200 min-h-full w-60 md:w-80 p-4">
         <li>
-          <a>
+          <RouterLink :to="bibleLink" @click="closeDrawer">
             <Icon icon="book_open" :size="20" />
             Bíblia
-          </a>
+          </RouterLink>
         </li>
         <li>
           <a>

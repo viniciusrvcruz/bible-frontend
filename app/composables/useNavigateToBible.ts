@@ -1,16 +1,24 @@
 export const useNavigateToBible = () => {
-  const router = useRouter()
   const versionStore = useVersionStore()
 
-  const goToChapter = (book: string, chapter: number, verse?: number) => {
+  const goToChapter = async (
+    book: string,
+    chapter: number,
+    verse?: number,
+    replace: boolean = false,
+  ) => {
     const version = versionStore.currentVersion
       ? `.${versionStore.currentVersion.name}`
       : ''
     const hash = verse && verse > 1
       ? `#v${verse}`
-      : ''
+      : undefined
 
-    router.push(`/bible/${book}.${chapter}${version}${hash}`)
+    await navigateTo({
+      path: `/bible/${book}.${chapter}${version}`,
+      hash,
+      replace,
+    })
   }
 
   return { goToChapter }

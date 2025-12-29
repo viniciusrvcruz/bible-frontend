@@ -89,7 +89,7 @@ const goToNextChapter = () => {
   
         <label
           for="select_verse_modal"
-          class="btn text-sm flex-1 mx-5 px-0 py-7 pointer-events-auto sm:text-lg lg:hidden"
+          class="btn text-sm flex-1 mx-2 sm:mx-5 px-0 py-7 border-2 border-base-300 pointer-events-auto sm:text-lg lg:hidden"
         >
           {{ bookName }} {{ chapter.number }}
         </label>
