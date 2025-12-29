@@ -1,16 +1,25 @@
 <script setup lang="ts">
-import ThemeSelectorPopover from '~/components/global/popover/ThemeSelectorPopover.vue';
+const route = useRoute()
 
 const themeSelectorPopoverRef = ref()
 
+const closeDrawer = () => {
+  document.getElementById('drawer')?.click()
+}
+
+const bibleLink = computed(() =>
+  route.path.startsWith('/bible/')
+    ? route.path
+    : '/bible'
+)
 </script>
 
 <template>
-  <div class="drawer">
+  <div class="drawer sticky top-0 z-1">
     <input id="drawer" type="checkbox" class="drawer-toggle" />
 
     <div class="drawer-content flex flex-col">
-      <div class="navbar bg-base-300 w-full justify-between items-center py-0 lg:px-10">
+      <div class="navbar h-header bg-base-300 w-full justify-between items-center py-0 lg:px-10">
         <div class="flex-none lg:hidden">
           <label for="drawer" aria-label="open sidebar" class="btn btn-ghost">
             <Icon icon="menu" :size="25" />
@@ -22,10 +31,10 @@ const themeSelectorPopoverRef = ref()
 
           <ul class="menu menu-horizontal gap-2 ms-5">
             <li>
-              <a>
+              <RouterLink :to="bibleLink">
                 <Icon icon="book_open" :size="20" />
                 Bíblia
-              </a>
+              </RouterLink>
             </li>
             <li>
               <a>
@@ -38,12 +47,12 @@ const themeSelectorPopoverRef = ref()
 
         <ul class="menu menu-horizontal gap-2 items-center">
           <li>
-            <button class="p-2">
+            <button v-tooltip.bottom="'Ajuda'" class="p-2">
               <Icon icon="circle_question" :size="22" />
             </button>
           </li>
           <li>
-            <button class="p-2" @click="themeSelectorPopoverRef.toggle">
+            <button v-tooltip.bottom="'Temas'" class="p-2" @click="themeSelectorPopoverRef.toggle">
               <Icon icon="palette" :size="22" />
             </button>
           </li>
@@ -60,10 +69,10 @@ const themeSelectorPopoverRef = ref()
       <label for="drawer" aria-label="close sidebar" class="drawer-overlay" />
       <ul class="menu bg-base-200 min-h-full w-60 md:w-80 p-4">
         <li>
-          <a>
+          <RouterLink :to="bibleLink" @click="closeDrawer">
             <Icon icon="book_open" :size="20" />
             Bíblia
-          </a>
+          </RouterLink>
         </li>
         <li>
           <a>
