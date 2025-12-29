@@ -14,6 +14,7 @@ const versionStore = useVersionStore()
 
 interface Props {
   selectVerse?: boolean
+  currentBook?: BookNameType | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -29,6 +30,7 @@ const search = ref('')
 const selectedBook = ref<BookNameType | null>(null)
 const selectedChapter = ref<number | null>(null)
 const chaptersWithVerses = ref<ChapterVerses[]>([])
+const selectionContainerRef = ref<HTMLElement | null>(null)
 
 const selectedBookInfo = computed(() => {
   if (!selectedBook.value) return null
@@ -60,8 +62,13 @@ const getChaptersWithVerses = async (book: BookNameType) => {
     .catch(console.error)
 }
 
+const scrollToTop = (top = 0) => {
+  selectionContainerRef.value?.scrollTo({ top })
+}
+
 const selectBook = (key: BookNameType) => {
   selectedBook.value = key
+  scrollToTop()
 
   if (props.selectVerse) {
     getChaptersWithVerses(key)
@@ -70,6 +77,7 @@ const selectBook = (key: BookNameType) => {
 
 const selectChapter = (chapter: number) => {
   if (!selectedBook.value) return
+  scrollToTop()
 
   if (props.selectVerse) {
     selectedChapter.value = chapter
@@ -94,6 +102,10 @@ const selectVerseNumber = (verse: number) => {
   })
 
   resetSelection()
+
+  nextTick(() => {
+    scrollToCurrentBook()
+  })
 }
 
 const goBack = () => {
@@ -111,10 +123,27 @@ const resetSelection = () => {
   selectedChapter.value = null
   chaptersWithVerses.value = []
 }
+
+const scrollToCurrentBook = () => {
+  if (!props.currentBook || !selectionContainerRef.value) return
+
+  const activeButton = selectionContainerRef.value.querySelector('.btn-active') as HTMLElement
+  if (!activeButton) return
+
+  scrollToTop(activeButton.offsetTop - 200)
+}
+
+onMounted(() => {
+  scrollToCurrentBook()
+})
+
+defineExpose({
+  scrollToCurrentBook,
+})
 </script>
 
 <template>
-  <section class="p-5 pt-0 overflow-y-auto h-full">
+  <section ref="selectionContainerRef" class="p-5 pt-0 overflow-y-auto h-full">
     <!-- Book selection view -->
     <template v-if="!selectedBook">
       <div class="pt-5 bg-base-100 sticky top-0 z-10">
@@ -133,6 +162,7 @@ const resetSelection = () => {
           v-for="book in filteredBooks"
           :key="book.key"
           class="btn btn-ghost justify-start text-base w-full lg:text-sm xl:text-base"
+          :class="{ 'btn-active': currentBook === book.key }"
           @click="selectBook(book.key)"
         >
           {{ book.info.name }}

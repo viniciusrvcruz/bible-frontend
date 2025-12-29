@@ -40,7 +40,7 @@ if (!chapterData) {
 
 <template>
   <main class="flex-1 flex justify-between">
-    <BibleVerseSelectorResponsivePanel />
+    <BibleVerseSelectorResponsivePanel :current-book="book" />
 
     <BibleChapter :chapter="chapterData" />
 

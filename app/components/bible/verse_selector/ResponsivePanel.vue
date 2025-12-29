@@ -1,10 +1,24 @@
 <script setup lang="ts">
 import type { VerseSelection } from '~/types/verse/Verse.type'
+import type { BookNameType } from '~/utils/book'
+
+defineProps<{
+  currentBook?: BookNameType | null
+}>()
 
 const { goToChapter } = useNavigateToBible()
 
 const isOpen = ref(false)
 const lgBreakpoint = ref<MediaQueryList | null>(null)
+const verseSelectorRef = ref<{ scrollToCurrentBook: () => void } | null>(null)
+
+watch(isOpen, (value) => {
+  if (!value) return
+
+  nextTick(() => {
+    verseSelectorRef.value?.scrollToCurrentBook()
+  })
+})
 
 onMounted(() => {
   lgBreakpoint.value = window.matchMedia('(min-width: 1024px)')
@@ -13,6 +27,8 @@ onMounted(() => {
 
 const handleBreakpointChange = (e: MediaQueryListEvent) => {
   if (e.matches) isOpen.value = false
+
+  verseSelectorRef.value?.scrollToCurrentBook()
 }
 
 onBeforeUnmount(() => {
@@ -30,7 +46,7 @@ const handleSelectVerse = (verse: VerseSelection) => {
   <input v-model="isOpen" type="checkbox" id="select_verse_modal" class="modal-toggle" />
 
   <div
-    class="lg:w-1/5 lg:sticky lg:top-header lg:h-screen-header"
+    class="lg:w-3/12 lg:sticky lg:top-header lg:h-screen-header xl:w-1/5"
     :class="{'modal': isOpen}"
     role="dialog"
   >
@@ -51,8 +67,10 @@ const handleSelectVerse = (verse: VerseSelection) => {
       </div>
 
       <BibleVerseSelector
+        ref="verseSelectorRef"
         class="bg-base-100 rounded-2xl"
         select-verse
+        :current-book="currentBook"
         @select-verse="handleSelectVerse"
       />
     </div>
