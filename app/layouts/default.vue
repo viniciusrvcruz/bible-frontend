@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import { useVersionService } from '~/composables/services/useVersionService'
 
 const versionStore = useVersionStore()
+const versionService = useVersionService()
 
-const isLoading = ref(true)
+const { data: versions } = await versionService.index()
 
-versionStore.getVersions().finally(() => {
-  isLoading.value = false
-})
+if (versions.value?.length) {
+  versionStore.setVersions(versions.value)
+}
 
 </script>
 

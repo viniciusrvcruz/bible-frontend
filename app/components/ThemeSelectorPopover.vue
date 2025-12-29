@@ -58,11 +58,11 @@ defineExpose({
               class="btn btn-sm justify-between gap-2 bg-base-100 border-base-300 text-base-content capitalize hover:bg-base-200"
               @click="setTheme(theme)"
             >
-              <span class="flex gap-1">
-                <span class="w-2 h-4 rounded bg-primary" />
-                <span class="w-2 h-4 rounded bg-secondary" />
-                <span class="w-2 h-4 rounded bg-accent" />
-              </span>
+              <Icon
+                icon="letter_case"
+                class="text-base-content"
+                :size="20"
+              />
               <Icon
                 v-if="colorMode.preference === theme"
                 icon="check"

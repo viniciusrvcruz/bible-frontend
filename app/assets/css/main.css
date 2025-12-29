@@ -4,6 +4,27 @@
   themes: all;
 }
 
+:root {
+  --h-header: 4rem
+}
+
+/* Scroll margin to the top of the page to the element with the id */
+[id] {
+  scroll-margin-top: 30vh;
+}
+
+@utility h-header {
+  height: var(--h-header);
+}
+
+@utility top-header {
+  top: var(--h-header);
+}
+
+@utility h-screen-header {
+  height: calc(100dvh - var(--h-header));
+}
+
 .p-popover {
   border: var(--border);
   border-radius: var(--radius-box);

@@ -17,6 +17,13 @@ const ICON_MAP = {
   user: 'lucide:user',
   book_marked: 'lucide:book-marked',
   check: 'lucide:check',
+  chevron_left: 'lucide:chevron-left',
+  chevron_right: 'lucide:chevron-right',
+  history: 'tabler:history',
+  letter_case: 'tabler:letter-case',
+  globe: 'lucide:globe',
+  search: 'lucide:search',
+  close: 'lucide:x',
 } as const
 
 </script>

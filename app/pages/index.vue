@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div>
-    <button class="btn">Button</button>
-  </div>
+  <main class="flex-1 flex justify-between">
+    Landing page
+  </main>
 </template>
