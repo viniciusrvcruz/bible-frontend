@@ -86,7 +86,6 @@ const addCurrentChapterToHistory = () => {
 
   historyModalRef.value?.addToHistory({
     book: props.chapter.book.name,
-    bookName: bookName.value,
     chapter: props.chapter.number,
     verse: verseNumber,
     versionName: versionStore.currentVersion?.name ?? '',
