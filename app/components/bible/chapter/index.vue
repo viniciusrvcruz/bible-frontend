@@ -11,16 +11,39 @@ const route = useRoute()
 const { goToChapter } = useNavigateToBible()
 const versionStore = useVersionStore()
 
+const historyModalRef = ref()
+const isVersionModalOpen = ref(false)
+const fontConfigPopoverRef = ref()
+const focusedVerseId = ref<string | null>(null)
+const isFocusActive = ref(false)
+
+// Manage font configuration cookies (already reactive)
+const fontSizeCookie = useCookie<string>('bible-font-size', { default: () => 'text-lg' })
+const fontFamilyCookie = useCookie<string>('bible-font-family', { default: () => 'font-sans' })
+
 const bookName = computed(() => {
   return getBookInfo(props.chapter.book.name as BookNameType).name
 })
 
-const historyModalRef = ref()
-const isVersionModalOpen = ref(false)
-const selectedFontSize = ref('text-lg')
-const selectedFontFamily = ref('font-sans')
-const focusedVerseId = ref<string | null>(null)
-const isFocusActive = ref(false)
+watch(() => route.hash, (newHash) => {
+  if (!newHash) {
+    clearFocus()
+    return
+  }
+
+  const verseId = newHash.slice(1)
+  focusedVerseId.value = verseId
+  isFocusActive.value = true
+
+  document.getElementById(verseId)?.scrollIntoView({ behavior: 'smooth' })
+})
+
+onMounted(() => {
+  if (import.meta.client) {
+    addCurrentChapterToHistory()
+    initializeVerseFocus()
+  }
+})
 
 const handleVersionSelect = async (version: Version) => {
   versionStore.setCurrentVersion(version)
@@ -57,14 +80,6 @@ const goToNextChapter = () => {
   goToChapter(props.chapter.next.book.name, props.chapter.next.number)
 }
 
-const loadFontSettings = () => {
-  const storedSize = localStorage.getItem('bible-font-size')
-  const storedFamily = localStorage.getItem('bible-font-family')
-  
-  if (storedSize) selectedFontSize.value = storedSize
-  if (storedFamily) selectedFontFamily.value = storedFamily
-}
-
 const addCurrentChapterToHistory = () => {
   const verseNumber = route.hash ? parseInt(route.hash.slice(2)) : undefined
 
@@ -79,51 +94,14 @@ const addCurrentChapterToHistory = () => {
 }
 
 const initializeVerseFocus = () => {
-  if (route.hash) {
-    const verseId = route.hash.slice(1)
-    focusedVerseId.value = verseId
-    isFocusActive.value = true
+  if(!route.hash) return
 
-    setTimeout(() => {
-      document.getElementById(verseId)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }, 100)
-  }
-}
-
-onMounted(() => {
-  if (import.meta.client) {
-    loadFontSettings()
-    addCurrentChapterToHistory()
-    initializeVerseFocus()
-  }
-})
-
-watch(selectedFontSize, (newSize) => {
-  if (import.meta.client) {
-    localStorage.setItem('bible-font-size', newSize)
-  }
-})
-
-watch(selectedFontFamily, (newFamily) => {
-  if (import.meta.client) {
-    localStorage.setItem('bible-font-family', newFamily)
-  }
-})
-
-watch(() => route.hash, (newHash) => {
-  if (!newHash) {
-    clearFocus()
-    return
-  }
-  
-  const verseId = newHash.slice(1)
+  const verseId = route.hash.slice(1)
   focusedVerseId.value = verseId
   isFocusActive.value = true
-  
-  setTimeout(() => {
-    document.getElementById(verseId)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  }, 100)
-})
+
+  document.getElementById(verseId)?.scrollIntoView({ behavior: 'smooth' })
+}
 
 </script>
 
@@ -149,12 +127,15 @@ watch(() => route.hash, (newHash) => {
             <Icon icon="history" :size="20" />
           </button>
           
-          <!-- Popover Configurações de Fonte -->
-          <BibleChapterFontConfigPopover 
-            v-model:font-size="selectedFontSize"
-            v-model:font-family="selectedFontFamily"
-          />
-          
+          <!-- Botão Configurações de Fonte -->
+          <button 
+            class="btn btn-sm"
+            @click="fontConfigPopoverRef?.toggle"
+            title="Configurações de texto"
+          >
+            <Icon icon="letter_case" :size="20" />
+          </button>
+
           <!-- Botão Versão -->
           <button 
             class="btn btn-sm"
@@ -188,8 +169,8 @@ watch(() => route.hash, (newHash) => {
         <div 
           :class="[
             'max-w-4xl mx-auto bible-text',
-            selectedFontSize,
-            selectedFontFamily
+            fontSizeCookie,
+            fontFamilyCookie
           ]"
         >
           <p
@@ -278,10 +259,13 @@ watch(() => route.hash, (newHash) => {
       </div>
     </div>
 
-    <!-- Modais -->
     <BibleChapterHistoryModal ref="historyModalRef" />
-
-    <BibleChapterVersionModal 
+    <BibleChapterFontConfigPopover
+      ref="fontConfigPopoverRef"
+      v-model:font-size="fontSizeCookie"
+      v-model:font-family="fontFamilyCookie"
+    />
+    <BibleChapterVersionModal
       v-model:is-open="isVersionModalOpen"
       @select="handleVersionSelect"
     />
@@ -335,24 +319,4 @@ footer a:hover {
   opacity: 0.8;
 }
 
-/* Fontes personalizadas */
-:deep(.font-arial) {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-:deep(.font-times) {
-  font-family: 'Times New Roman', Times, serif;
-}
-
-:deep(.font-verdana) {
-  font-family: Verdana, Geneva, sans-serif;
-}
-
-:deep(.font-georgia) {
-  font-family: Georgia, 'Times New Roman', serif;
-}
-
-:deep(.font-courier) {
-  font-family: 'Courier New', Courier, monospace;
-}
 </style>

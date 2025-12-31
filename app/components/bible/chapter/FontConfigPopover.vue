@@ -1,130 +1,115 @@
 <script setup lang="ts">
 const fontSizes = [
-  { label: 'Muito Pequeno', value: 'text-sm', size: 1 },
-  { label: 'Pequeno', value: 'text-base', size: 2 },
-  { label: 'Médio', value: 'text-lg', size: 3 },
-  { label: 'Grande', value: 'text-xl', size: 4 },
-  { label: 'Extra Grande', value: 'text-2xl', size: 5 },
-  { label: 'Muito Grande', value: 'text-3xl', size: 6 },
+  'text-sm',
+  'text-base',
+  'text-lg',
+  'text-xl',
+  'text-2xl',
+  'text-3xl',
 ]
 
 const fontFamilies = [
-  { label: 'Sans Serif', value: 'font-sans', style: 'system-ui, -apple-system, sans-serif' },
-  { label: 'Serif', value: 'font-serif', style: 'Georgia, serif' },
-  { label: 'Mono', value: 'font-mono', style: 'ui-monospace, monospace' },
-  { label: 'Arial', value: 'font-arial', style: 'Arial, sans-serif' },
-  { label: 'Times', value: 'font-times', style: 'Times New Roman, serif' },
-  { label: 'Verdana', value: 'font-verdana', style: 'Verdana, sans-serif' },
-  { label: 'Georgia', value: 'font-georgia', style: 'Georgia, serif' },
-  { label: 'Courier', value: 'font-courier', style: 'Courier New, monospace' },
+  { label: 'Sans Serif', value: 'font-sans' },
+  { label: 'Serif', value: 'font-serif' },
+  { label: 'Mono', value: 'font-mono' },
+  { label: 'Arial', value: 'font-arial' },
+  { label: 'Times', value: 'font-times' },
+  { label: 'Verdana', value: 'font-verdana' },
+  { label: 'Georgia', value: 'font-georgia' },
+  { label: 'Courier', value: 'font-courier' },
 ]
 
-const selectedFontSize = defineModel<string>('fontSize', { default: 'text-lg' })
-const selectedFontFamily = defineModel<string>('fontFamily', { default: 'font-sans' })
+// Use v-model to receive values from parent component
+const selectedFontSize = defineModel<string | null>('fontSize', { required: true })
+const selectedFontFamily = defineModel<string | null>('fontFamily', { required: true })
 
 const popoverRef = ref()
 
 const currentSizeIndex = computed(() => {
-  return fontSizes.findIndex(f => f.value === selectedFontSize.value)
+  return fontSizes.findIndex(size => size === selectedFontSize.value)
 })
 
 const increaseFontSize = () => {
   const currentIndex = currentSizeIndex.value
-  if (currentIndex < fontSizes.length - 1) {
-    selectedFontSize.value = fontSizes[currentIndex + 1].value
-  }
+
+  const nextSize = fontSizes[currentIndex + 1]
+
+  if (!nextSize) return
+
+  selectedFontSize.value = nextSize
 }
 
 const decreaseFontSize = () => {
   const currentIndex = currentSizeIndex.value
-  if (currentIndex > 0) {
-    selectedFontSize.value = fontSizes[currentIndex - 1].value
-  }
+
+  const prevSize = fontSizes[currentIndex - 1]
+
+  if (!prevSize) return
+
+  selectedFontSize.value = prevSize
 }
 
-const togglePopover = (event: Event) => {
+const setFontFamily = (fontValue: string) => {
+  selectedFontFamily.value = fontValue
+}
+
+const toggle = (event: Event) => {
   popoverRef.value.toggle(event)
 }
+
+// Expose function to open popover
+defineExpose({
+  toggle,
+})
 </script>
 
 <template>
-  <div>
-    <button 
-      class="btn btn-sm"
-      @click="togglePopover"
-      title="Configurações de texto"
-    >
-      <Icon icon="letter_case" :size="20" />
-    </button>
-    
-    <Popover ref="popoverRef" class="font-config-popover">
-      <div class="p-4 w-80 bg-base-100">
-        <h3 class="font-bold text-lg mb-4">Configurações de Texto</h3>
-        
-        <!-- Controles de tamanho -->
-        <div class="mb-4">
-          <label class="label">
-            <span class="label-text font-semibold">Tamanho da Fonte</span>
-          </label>
-          <div class="flex gap-2 mb-3">
-            <button
-              class="btn btn-sm flex-1"
-              :disabled="currentSizeIndex === 0"
-              @click="decreaseFontSize"
-            >
-              <span class="text-sm">A-</span>
-            </button>
-            <button
-              class="btn btn-sm flex-1"
-              :disabled="currentSizeIndex === fontSizes.length - 1"
-              @click="increaseFontSize"
-            >
-              <span class="text-lg font-semibold">A+</span>
-            </button>
-          </div>
-          
-          <div class="grid grid-cols-2 gap-2">
-            <button
-              v-for="size in fontSizes"
-              :key="size.value"
-              class="btn btn-sm justify-start hover:bg-base-200"
-              :class="{
-                'bg-base-200 ring-2 ring-primary/30': selectedFontSize === size.value
-              }"
-              @click="selectedFontSize = size.value"
-            >
-              <span :class="size.value" class="truncate">{{ size.label }}</span>
-            </button>
-          </div>
-        </div>
-        
-        <!-- Seleção de fonte -->
-        <div>
-          <label class="label">
-            <span class="label-text font-semibold">Fonte</span>
-          </label>
-          <div class="grid grid-cols-2 gap-2">
-            <button
-              v-for="font in fontFamilies"
-              :key="font.value"
-              class="btn btn-sm justify-start hover:bg-base-200"
-              :class="{
-                'bg-base-200 ring-2 ring-primary/30': selectedFontFamily === font.value
-              }"
-              @click="selectedFontFamily = font.value"
-            >
-              <span :style="{ fontFamily: font.style }" class="truncate">{{ font.label }}</span>
-            </button>
-          </div>
+  <Popover ref="popoverRef" class="max-w-80">
+    <div class="p-4 w-80 bg-base-100 text-base-content">
+      <h3 class="font-bold text-lg mb-4">Configurações de Texto</h3>
+      
+      <!-- Font size controls with join buttons -->
+      <div class="mb-4">
+        <label class="label">
+          <span class="label-text font-semibold">Tamanho da Fonte</span>
+        </label>
+        <div class="join w-full">
+          <button
+            class="btn btn-sm join-item flex-1 text-sm"
+            :disabled="currentSizeIndex === 0"
+            @click="decreaseFontSize"
+          >
+            A-
+          </button>
+          <button
+            class="btn btn-sm join-item flex-1 text-lg font-semibold"
+            :disabled="currentSizeIndex === fontSizes.length - 1"
+            @click="increaseFontSize"
+          >
+            A+
+          </button>
         </div>
       </div>
-    </Popover>
-  </div>
+
+      <!-- Font family selection -->
+      <div>
+        <label class="label">
+          <span class="label-text font-semibold">Fonte</span>
+        </label>
+        <div class="grid grid-cols-2 gap-2">
+          <button
+            v-for="font in fontFamilies"
+            :key="font.value"
+            class="btn btn-sm justify-start hover:bg-base-200"
+            :class="{
+              'bg-base-300': selectedFontFamily === font.value
+            }"
+            @click="setFontFamily(font.value)"
+          >
+            <span :class="font.value">{{ font.label }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </Popover>
 </template>
-
-<style scoped>
-.font-config-popover {
-  max-width: 320px;
-}
-</style>
-
