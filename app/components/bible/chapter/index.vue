@@ -2,7 +2,6 @@
 import type { BookNameType } from '~/utils/book';
 import type { Chapter } from '~/types/chapter/Chapter.type'
 import type { Version } from '~/types/version/Version.type'
-import type { VerseHistory } from '~/types/history/VerseHistory.type'
 
 const props = defineProps<{
   chapter: Chapter
@@ -22,10 +21,6 @@ const selectedFontSize = ref('text-lg')
 const selectedFontFamily = ref('font-sans')
 const focusedVerseId = ref<string | null>(null)
 const isFocusActive = ref(false)
-
-const handleHistoryNavigate = (item: VerseHistory) => {
-  goToChapter(item.book, item.chapter, item.verse)
-}
 
 const handleVersionSelect = async (version: Version) => {
   versionStore.setCurrentVersion(version)
@@ -70,13 +65,15 @@ const loadFontSettings = () => {
   if (storedFamily) selectedFontFamily.value = storedFamily
 }
 
-const addCurrentVerseToHistory = () => {
-  const verseNumber = route.hash ? parseInt(route.hash.slice(2)) : 1
+const addCurrentChapterToHistory = () => {
+  const verseNumber = route.hash ? parseInt(route.hash.slice(2)) : undefined
+
   historyModalRef.value?.addToHistory({
     book: props.chapter.book.name,
     bookName: bookName.value,
     chapter: props.chapter.number,
     verse: verseNumber,
+    versionName: versionStore.currentVersion?.name ?? '',
     timestamp: Date.now()
   })
 }
@@ -86,7 +83,7 @@ const initializeVerseFocus = () => {
     const verseId = route.hash.slice(1)
     focusedVerseId.value = verseId
     isFocusActive.value = true
-    
+
     setTimeout(() => {
       document.getElementById(verseId)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }, 100)
@@ -96,7 +93,7 @@ const initializeVerseFocus = () => {
 onMounted(() => {
   if (import.meta.client) {
     loadFontSettings()
-    addCurrentVerseToHistory()
+    addCurrentChapterToHistory()
     initializeVerseFocus()
   }
 })
@@ -282,11 +279,8 @@ watch(() => route.hash, (newHash) => {
     </div>
 
     <!-- Modais -->
-    <BibleChapterHistoryModal 
-      ref="historyModalRef"
-      @navigate="handleHistoryNavigate"
-    />
-    
+    <BibleChapterHistoryModal ref="historyModalRef" />
+
     <BibleChapterVersionModal 
       v-model:is-open="isVersionModalOpen"
       @select="handleVersionSelect"
