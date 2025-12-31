@@ -10,7 +10,7 @@
 
 /* Scroll margin to the top of the page to the element with the id */
 [id] {
-  scroll-margin-top: 30vh;
+  scroll-margin-top: 25vh;
 }
 
 @utility h-header {
@@ -26,11 +26,9 @@
 }
 
 .p-popover {
-  border: 1px solid oklch(var(--bc) / 0.2);
-  border-radius: var(--rounded-box, 1rem);
-  background-color: oklch(var(--b1));
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-  z-index: 1000;
+  border: var(--border);
+  border-radius: var(--radius-box);
+  background-color: var(--color-base-200);
 }
 .p-popover::before,
 .p-popover::after {

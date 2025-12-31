@@ -53,7 +53,12 @@ const setFontFamily = (fontValue: string) => {
 
 <template>
   <div class="dropdown dropdown-center">
-    <div tabindex="0" role="button" class="btn btn-sm" title="Configurações de texto">
+    <div
+      v-tooltip.bottom="'Configurações de texto'"
+      tabindex="0"
+      role="button"
+      class="btn btn-sm"
+    >
       <Icon icon="letter_case" :size="20" />
     </div>
     <ul

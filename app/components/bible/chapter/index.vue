@@ -15,6 +15,9 @@ const historyModalRef = ref()
 const versionModalRef = ref()
 const focusedVerseId = ref<string | null>(null)
 const isFocusActive = ref(false)
+const isScrollingFromProgrammatic = ref(false)
+const chapterContainerRef = ref<HTMLElement | null>(null)
+const overlayHeight = ref(0)
 
 // Manage font configuration cookies (already reactive)
 const fontSizeCookie = useCookie<string>('bible-font-size', { default: () => 'text-lg' })
@@ -31,16 +34,44 @@ watch(() => route.hash, (newHash) => {
   }
 
   const verseId = newHash.slice(1)
+  const verseNumber = parseInt(verseId.slice(1))
+
+  // Check if verse is not 1 and if there's scroll in the div
+  const container = chapterContainerRef.value
+  const hasScroll = container ? container.scrollHeight > container.clientHeight : false
+  
+  if (verseNumber === 1 || !hasScroll) {
+    focusedVerseId.value = null
+    isFocusActive.value = false
+    return
+  }
+
   focusedVerseId.value = verseId
   isFocusActive.value = true
+  isScrollingFromProgrammatic.value = true
+  updateOverlayHeight()
 
   document.getElementById(verseId)?.scrollIntoView({ behavior: 'smooth' })
+
+  // Remove flag after scroll animation ends
+  setTimeout(() => {
+    isScrollingFromProgrammatic.value = false
+  }, 1000)
 })
 
 onMounted(() => {
   if (import.meta.client) {
     addCurrentChapterToHistory()
     initializeVerseFocus()
+
+    // Update overlay height when window is resized
+    window.addEventListener('resize', updateOverlayHeight)
+  }
+})
+
+onUnmounted(() => {
+  if (import.meta.client) {
+    window.removeEventListener('resize', updateOverlayHeight)
   }
 })
 
@@ -64,6 +95,11 @@ const handleOverlayClick = () => {
 }
 
 const handleScroll = () => {
+  // Ignore scroll if caused by programmatic scrollIntoView
+  if (isScrollingFromProgrammatic.value) {
+    return
+  }
+
   if (isFocusActive.value) {
     clearFocus()
   }
@@ -93,14 +129,41 @@ const addCurrentChapterToHistory = () => {
   })
 }
 
+const updateOverlayHeight = () => {
+  nextTick(() => {
+    if (chapterContainerRef.value) {
+      overlayHeight.value = chapterContainerRef.value.scrollHeight
+    }
+  })
+}
+
 const initializeVerseFocus = () => {
   if(!route.hash) return
 
   const verseId = route.hash.slice(1)
+  const verseNumber = parseInt(verseId.slice(1))
+
+  // Check if verse is not 1 and if there's scroll in the div
+  const container = chapterContainerRef.value
+  const hasScroll = container ? container.scrollHeight > container.clientHeight : false
+
+  if (verseNumber === 1 || !hasScroll) {
+    focusedVerseId.value = null
+    isFocusActive.value = false
+    return
+  }
+
   focusedVerseId.value = verseId
   isFocusActive.value = true
+  isScrollingFromProgrammatic.value = true
+  updateOverlayHeight()
 
   document.getElementById(verseId)?.scrollIntoView({ behavior: 'smooth' })
+
+  // Remove flag after scroll animation ends
+  setTimeout(() => {
+    isScrollingFromProgrammatic.value = false
+  }, 1000)
 }
 
 </script>
@@ -108,36 +171,37 @@ const initializeVerseFocus = () => {
 <template>
   <section class="flex-1 flex flex-col justify-between h-screen-header overflow-hidden">
     <div 
-      class="flex flex-col overflow-y-auto h-full chapter-container relative"
+      ref="chapterContainerRef"
+      class="flex flex-col overflow-y-auto h-full scroll-smooth relative"
       @scroll="handleScroll"
     >
-      <!-- Header com botões -->
+      <!-- Header with buttons -->
       <div class="navbar py-2.5 px-5 bg-base-100 shadow-sm sticky top-0 items-center z-20 lg:px-10">
         <span class="hidden font-bold text-xl lg:inline">
           {{ bookName }} {{ chapter.number }}
         </span>
 
         <div class="ms-auto space-x-2 flex items-center">
-          <!-- Botão Histórico -->
+          <!-- History button -->
           <button
+            v-tooltip.bottom="'Histórico de versículos'"
             class="btn btn-sm"
             @click="historyModalRef?.open()"
-            title="Histórico de versículos"
           >
             <Icon icon="history" :size="20" />
           </button>
 
-          <!-- Botão de Configurações de Texto -->
+          <!-- Font configuration button -->
           <BibleChapterFontConfigDropdown
             v-model:font-size="fontSizeCookie"
             v-model:font-family="fontFamilyCookie"
           />
 
-          <!-- Botão Versão -->
-          <button 
+          <!-- Version button -->
+          <button
+            v-tooltip.bottom="'Selecionar versão'"
             class="btn btn-sm"
             @click="versionModalRef?.open()"
-            title="Selecionar versão"
           >
             <Icon icon="globe" :size="20" />
             <span class="font-bold">
@@ -147,14 +211,15 @@ const initializeVerseFocus = () => {
         </div>
       </div>
 
-      <!-- Overlay de foco (apenas na section do chapter) -->
+      <!-- Focus overlay (only in chapter section) -->
       <div 
         v-if="isFocusActive"
-        class="absolute inset-0 bg-black/40 z-10 cursor-pointer"
+        class="absolute top-0 left-0 right-0 bg-black/20 z-10 cursor-pointer transition-opacity duration-300 ease-in-out"
+        :style="{ height: `${overlayHeight}px` }"
         @click="handleOverlayClick"
-      ></div>
+      />
 
-      <!-- Conteúdo Principal -->
+      <!-- Main content -->
       <div class="px-5 flex-1 sm:px-10 lg:px-20">
         <h1 class="text-xl font-bold text-center text-base-content/60 mt-6 mb-2">
           {{ bookName }}
@@ -165,7 +230,7 @@ const initializeVerseFocus = () => {
         
         <div 
           :class="[
-            'max-w-4xl mx-auto bible-text',
+            'max-w-4xl mx-auto text-justify',
             fontSizeCookie,
             fontFamilyCookie
           ]"
@@ -174,14 +239,18 @@ const initializeVerseFocus = () => {
             v-for="verse in chapter.verses"
             :key="verse.id"
             :id="`v${verse.number}`"
-            class="verse-item cursor-pointer transition-all mb-4"
+            class="px-2 py-1 block leading-[1.9] indent-0 cursor-pointer transition-all duration-200 ease-in-out mb-4"
             :class="{
-              'relative z-20 bg-base-100 rounded px-2 py-1 shadow-lg': isFocusActive && focusedVerseId === `v${verse.number}`,
+              'relative z-20 bg-base-100 rounded shadow-lg': isFocusActive && focusedVerseId === `v${verse.number}`,
               'hover:bg-base-200/50 rounded px-1': !isFocusActive
             }"
           >
-            <sup class="verse-number font-bold text-primary me-2">{{ verse.number }}</sup>
-            <span class="verse-text">{{ verse.text }}</span>
+            <sup class="text-[0.8em] align-super leading-0 font-bold text-base-content/50 me-2">
+              {{ verse.number }}
+            </sup>
+            <span class="leading-[1.9]">
+              {{ verse.text }}
+            </span>
           </p>
         </div>
         
@@ -190,9 +259,9 @@ const initializeVerseFocus = () => {
           v-if="chapter.version?.copyright"
           class="mt-12 mb-6 text-center text-sm text-base-content/60 max-w-4xl mx-auto"
           v-html="chapter.version.copyright"
-        ></div>
+        />
         
-        <!-- Divisor e Footer -->
+        <!-- Divider and Footer -->
         <hr class="my-8 border-base-300 max-w-4xl mx-auto" />
         
         <footer class="pb-8 text-center text-sm text-base-content/70 max-w-4xl mx-auto">
@@ -204,7 +273,7 @@ const initializeVerseFocus = () => {
               href="https://github.com/viniciusrvcruz/bible-frontend"
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center gap-2 hover:text-primary transition-colors"
+              class="inline-flex items-center gap-2 text-inherit underline hover:text-primary hover:opacity-80 transition-colors"
               title="Repositório do Projeto no GitHub"
             >
               <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -217,7 +286,7 @@ const initializeVerseFocus = () => {
               href="https://www.linkedin.com/in/viniciuscruz7"
               target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex items-center gap-2 hover:text-primary transition-colors"
+              class="inline-flex items-center gap-2 text-inherit underline hover:text-primary hover:opacity-80 transition-colors"
               title="LinkedIn"
             >
               <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -229,11 +298,11 @@ const initializeVerseFocus = () => {
         </footer>
       </div>
 
-      <!-- Botões de Navegação -->
+      <!-- Navigation buttons -->
       <div class="flex justify-between sticky bottom-0 w-full pointer-events-none">
         <button
           v-if="chapter.previous"
-          class="btn btn-xl btn-circle mb-15 ms-5 border-2 border-base-300 shadow-sm pointer-events-auto lg:mb-20 lg:ms-10"
+          class="btn btn-xl btn-circle mb-15 ms-5 border-2 border-base-300 shadow-sm pointer-events-auto lg:ms-10 lg:mb-40"
           @click="goToPreviousChapter"
         >
           <Icon icon="chevron_left" />
@@ -248,7 +317,7 @@ const initializeVerseFocus = () => {
 
         <button
           v-if="chapter.next"
-          class="btn btn-xl btn-circle mb-15 me-5 border-2 border-base-300 shadow-sm pointer-events-auto lg:mb-20 lg:me-10 lg:ms-auto"
+          class="btn btn-xl btn-circle mb-15 me-5 border-2 border-base-300 shadow-sm pointer-events-auto lg:me-10 lg:ms-auto lg:mb-40"
           @click="goToNextChapter"
         >
           <Icon icon="chevron_right" />
@@ -263,52 +332,3 @@ const initializeVerseFocus = () => {
     />
   </section>
 </template>
-
-<style scoped>
-.chapter-container {
-  scroll-behavior: smooth;
-}
-
-.bible-text {
-  text-align: justify;
-  text-justify: inter-word;
-}
-
-.verse-item {
-  display: block;
-  line-height: 1.9;
-  text-indent: 0;
-}
-
-.verse-number {
-  font-size: 0.7em;
-  vertical-align: super;
-  line-height: 0;
-  font-weight: 700;
-}
-
-.verse-text {
-  line-height: 1.9;
-}
-
-/* Smooth transitions */
-.transition-all {
-  transition: all 0.2s ease-in-out;
-}
-
-/* Overlay de foco */
-.absolute.inset-0 {
-  transition: opacity 0.3s ease-in-out;
-}
-
-/* Copyright HTML styling */
-footer a {
-  color: inherit;
-  text-decoration: underline;
-}
-
-footer a:hover {
-  opacity: 0.8;
-}
-
-</style>
