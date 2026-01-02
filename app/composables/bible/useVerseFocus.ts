@@ -3,11 +3,11 @@ export const useVerseFocus = (
   verseNumber: Ref<number | null> | ComputedRef<number | null>,
   onClearFocus?: () => void
 ) => {
-  const isFocusActive = ref(false)
+  const focusedVerseNumber = ref<number | null>(null)
   let scrollTimeout: ReturnType<typeof setTimeout> | null = null
 
   const overlayHeight = computed(() => {
-    if (!isFocusActive.value || !containerRef.value) return 0
+    if (!focusedVerseNumber.value || !containerRef.value) return 0
 
     return containerRef.value.scrollHeight
   })
@@ -19,7 +19,7 @@ export const useVerseFocus = (
   }
 
   const clearFocus = () => {
-    isFocusActive.value = false
+    focusedVerseNumber.value = null
 
     if (verseNumber.value) onClearFocus?.()
   }
@@ -37,7 +37,7 @@ export const useVerseFocus = (
     const verseElement = container.querySelector(`#v${verseNumber.value}`)
     if (!verseElement) return
 
-    isFocusActive.value = true
+    focusedVerseNumber.value = verseNumber.value
     verseElement.scrollIntoView({ behavior: 'smooth' })
     resetScrollTimeout()
   }
@@ -49,13 +49,13 @@ export const useVerseFocus = (
   const handleScroll = () => {
     if (scrollTimeout) return resetScrollTimeout()
 
-    if (isFocusActive.value) clearFocus()
+    if (focusedVerseNumber.value) clearFocus()
   }
 
   watch(verseNumber, handleVerseFocus)
 
   return {
-    isFocusActive,
+    focusedVerseNumber,
     overlayHeight,
     handleScroll,
     handleVerseFocus,

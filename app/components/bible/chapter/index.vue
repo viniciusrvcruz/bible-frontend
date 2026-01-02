@@ -33,7 +33,7 @@ const clearHash = () => {
 }
 
 const {
-  isFocusActive,
+  focusedVerseNumber,
   overlayHeight,
   handleScroll,
   handleVerseFocus,
@@ -96,7 +96,7 @@ const goToNextChapter = () => {
 
       <!-- Focus overlay (only in chapter section) -->
       <div 
-        v-if="isFocusActive"
+        v-if="focusedVerseNumber"
         class="absolute top-0 left-0 right-0 bg-black/20 z-1 cursor-pointer transition-opacity duration-300 ease-in-out"
         :style="{ height: `${overlayHeight}px` }"
         @click="clearFocus"
@@ -123,8 +123,8 @@ const goToNextChapter = () => {
             :key="verse.id"
             :id="`v${verse.number}`"
             :verse="verse"
-            :is-focused="isFocusActive && verseNumber === verse.number"
-            :is-focus-active="isFocusActive"
+            :is-focused="verse.number === focusedVerseNumber"
+            :is-focus-active="!!focusedVerseNumber"
           />
         </div>
 
