@@ -11,7 +11,7 @@ defineProps<{
 
 <template>
   <p
-    class="px-2 py-1 block leading-[1.9] indent-0 cursor-pointer transition-all duration-200 ease-in-out mb-4"
+    class="px-2 py-1 block leading-[1.9] indent-0 cursor-pointer transition-all duration-200 ease-in-out mb-[0.4em]"
     :class="{
       'relative bg-base-100 rounded shadow-lg z-2': isFocused,
       'hover:bg-base-200/50 rounded': !isFocusActive
