@@ -15,7 +15,7 @@ const bibleLink = computed(() =>
 </script>
 
 <template>
-  <div class="drawer sticky top-0 z-1">
+  <div class="drawer sticky top-0 z-10">
     <input id="drawer" type="checkbox" class="drawer-toggle" />
 
     <div class="drawer-content flex flex-col">

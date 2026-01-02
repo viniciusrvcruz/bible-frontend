@@ -1,43 +1,16 @@
 <script setup lang="ts">
-import { chapterHistorySchema } from '~/types/chapterHistory/ChapterHistory.schema'
 import type { ChapterHistory } from '~/types/chapterHistory/ChapterHistory.type'
-
-const STORAGE_KEY = 'chapter-history'
-const MAX_HISTORY_ITEMS = 30
+import { useChapterHistory } from '~/composables/bible/useChapterHistory'
 
 const { goToChapter } = useNavigateToBible()
+const {
+  chapterHistory,
+  addToHistory,
+  clearHistory,
+  loadHistory
+} = useChapterHistory()
 
 const dialogRef = useTemplateRef<HTMLDialogElement>('dialogRef')
-const chapterHistory = ref<ChapterHistory[]>([])
-
-onMounted(() => {
-  loadHistory()
-})
-
-const loadHistory = () => {
-  if (!import.meta.client) return
-
-  const stored = localStorage.getItem(STORAGE_KEY)
-
-  if (!stored) return
-
-  try {
-    const parsed = JSON.parse(stored)
-    chapterHistory.value = chapterHistorySchema.array().parse(parsed)
-  } catch {
-    localStorage.removeItem(STORAGE_KEY)
-  }
-}
-
-const addToHistory = (item: ChapterHistory) => {
-  if (!import.meta.client) return
-
-  chapterHistory.value.unshift(item)
-
-  chapterHistory.value = chapterHistory.value.slice(0, MAX_HISTORY_ITEMS)
-
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(chapterHistory.value))
-}
 
 const open = () => {
   loadHistory()
@@ -60,14 +33,6 @@ const formatChapter = (item: ChapterHistory) => {
   if (!item.verse) return `${bookName} ${item.chapter}`
 
   return `${bookName} ${item.chapter}:${item.verse}`
-}
-
-const clearHistory = () => {
-  chapterHistory.value = []
-
-  if (!import.meta.client) return
-
-  localStorage.removeItem(STORAGE_KEY)
 }
 
 defineExpose({
