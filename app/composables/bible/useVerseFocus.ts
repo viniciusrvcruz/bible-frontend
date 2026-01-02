@@ -3,10 +3,8 @@ export const useVerseFocus = (
   verseNumber: Ref<number | null> | ComputedRef<number | null>,
   onClearFocus?: () => void
 ) => {
-  const focusedVerseId = ref<string | null>(null)
-  const scrollTimeoutId = ref<ReturnType<typeof setTimeout> | null>(null)
-
-  const isFocusActive = computed(() => !!focusedVerseId.value)
+  const isFocusActive = ref(false)
+  let scrollTimeout: ReturnType<typeof setTimeout> | null = null
 
   const overlayHeight = computed(() => {
     if (!isFocusActive.value || !containerRef.value) return 0
@@ -14,62 +12,49 @@ export const useVerseFocus = (
     return containerRef.value.scrollHeight
   })
 
-  const shouldFocusVerse = (verseNum: number): boolean => {
-    if (verseNum === 1) return false
+  const resetScrollTimeout = () => {
+    if (scrollTimeout) clearTimeout(scrollTimeout)
 
-    const container = containerRef.value
-    if (!container) return false
-
-    return container.scrollHeight > container.clientHeight
-  }
-
-  const resetScrollFlag = () => {
-    if (scrollTimeoutId.value) clearTimeout(scrollTimeoutId.value)
-
-    scrollTimeoutId.value = setTimeout(() => {
-      scrollTimeoutId.value = null
-    }, 150)
-  }
-
-  const focusVerse = (verseNum: number) => {
-    const verseId = `v${verseNum}`
-    const verseElement = containerRef.value?.querySelector(`#${verseId}`)
-
-    if (!verseElement) return
-
-    focusedVerseId.value = verseId
-    verseElement.scrollIntoView({ behavior: 'smooth' })
-    resetScrollFlag()
+    scrollTimeout = setTimeout(() => scrollTimeout = null, 150)
   }
 
   const clearFocus = () => {
-    focusedVerseId.value = null
+    isFocusActive.value = false
 
-    if (verseNumber.value) {
-      onClearFocus?.()
-    }
+    if (verseNumber.value) onClearFocus?.()
   }
 
-  const handleVerseFocus = (verseNum: number | null) => {
-    if (!verseNum) return clearFocus()
+  const focusVerse = () => {
+    if (!verseNumber.value || !containerRef.value) return clearFocus()
 
-    if (!shouldFocusVerse(verseNum)) return clearFocus()
+    const container = containerRef.value
 
-    focusVerse(verseNum)
+    // Don't focus verse 1 or if the content doesn't need to be scrolled
+    if (verseNumber.value === 1 || container.scrollHeight <= container.clientHeight) {
+      return clearFocus()
+    }
+
+    const verseElement = container.querySelector(`#v${verseNumber.value}`)
+    if (!verseElement) return
+
+    isFocusActive.value = true
+    verseElement.scrollIntoView({ behavior: 'smooth' })
+    resetScrollTimeout()
+  }
+
+  const handleVerseFocus = () => {
+    verseNumber.value ? focusVerse() : clearFocus()
   }
 
   const handleScroll = () => {
-    if (scrollTimeoutId.value !== null) return resetScrollFlag()
+    if (scrollTimeout) return resetScrollTimeout()
 
-    if (!isFocusActive.value) return
-
-    clearFocus()
+    if (isFocusActive.value) clearFocus()
   }
 
   watch(verseNumber, handleVerseFocus)
 
   return {
-    focusedVerseId,
     isFocusActive,
     overlayHeight,
     handleScroll,
@@ -77,4 +62,3 @@ export const useVerseFocus = (
     clearFocus
   }
 }
-

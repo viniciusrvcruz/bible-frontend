@@ -44,7 +44,7 @@ onMounted(() => {
   if(!import.meta.client) return
 
   addCurrentChapterToHistory()
-  handleVerseFocus(verseNumber.value)
+  handleVerseFocus()
 })
 
 const addCurrentChapterToHistory = () => {
@@ -123,7 +123,7 @@ const goToNextChapter = () => {
             :key="verse.id"
             :id="`v${verse.number}`"
             :verse="verse"
-            :is-focused="verseNumber === verse.number"
+            :is-focused="isFocusActive && verseNumber === verse.number"
             :is-focus-active="isFocusActive"
           />
         </div>
