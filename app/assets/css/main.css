@@ -10,7 +10,7 @@
 
 /* Scroll margin to the top of the page to the element with the id */
 [id] {
-  scroll-margin-top: 30vh;
+  scroll-margin-top: 25vh;
 }
 
 @utility h-header {
@@ -33,4 +33,25 @@
 .p-popover::before,
 .p-popover::after {
   display: none !important;
+}
+
+/* Fontes personalizadas */
+.font-arial {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.font-times {
+  font-family: 'Times New Roman', Times, serif;
+}
+
+.font-verdana {
+  font-family: Verdana, Geneva, sans-serif;
+}
+
+.font-georgia {
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.font-courier {
+  font-family: 'Courier New', Courier, monospace;
 }

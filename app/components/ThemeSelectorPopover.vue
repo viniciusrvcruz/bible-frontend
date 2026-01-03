@@ -42,8 +42,8 @@ defineExpose({
 </script>
 
 <template>
-  <Popover ref="popover" class="border-none ms-5">
-    <div class="bg-base-200 p-3 min-w-max max-h-96 overflow-y-auto">
+  <Popover ref="popover">
+    <div class="max-h-96 overflow-y-auto">
       <div class="grid grid-cols-2 gap-3">
         <div v-for="group in themeGroups" :key="group.title">
           <h3 class="text-sm font-semibold mb-2 text-base-content">

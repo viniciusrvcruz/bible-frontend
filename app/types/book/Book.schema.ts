@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const bookSchema = z.object({
   id: z.int(),
-  name: z.string(),
+  name: z.enum(BookName),
   order: z.int(),
 })
 
