@@ -113,7 +113,7 @@ const goToNextChapter = () => {
 
         <div 
           :class="[
-            'max-w-4xl mx-auto text-justify',
+            'max-w-2xl mx-auto text-justify',
             fontSize,
             fontFamily
           ]"
