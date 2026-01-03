@@ -6,24 +6,20 @@ import { normalizeString } from '~/utils/helpers'
 import { useNavigateToBible } from '~/composables/useNavigateToBible'
 import { useChapterService } from '~/composables/services/useChapterService'
 
-// ===== TIPOS =====
 interface ChapterVerses {
   number: number
   verses_count: number
 }
 
-// ===== COMPOSABLES =====
 const { goToChapter } = useNavigateToBible()
 const chapterService = useChapterService()
 const versionStore = useVersionStore()
 
-// ===== REFS DOS ELEMENTOS =====
 const dialogRef = useTemplateRef<HTMLDialogElement>('dialogRef')
 const bookInputRef = useTemplateRef<HTMLInputElement>('bookInputRef')
 const chapterInputRef = useTemplateRef<HTMLInputElement>('chapterInputRef')
 const verseInputRef = useTemplateRef<HTMLInputElement>('verseInputRef')
 
-// ===== ESTADO =====
 const bookSearch = ref('')
 const chapterSearch = ref('')
 const verseSearch = ref('')
@@ -31,9 +27,7 @@ const verseSearch = ref('')
 const selectedBook = ref<BookNameType | null>(null)
 const selectedChapter = ref<number | null>(null)
 const chaptersWithVerses = ref<ChapterVerses[]>([])
-const lastValidChapter = ref<string>('')
 
-// ===== COMPUTED =====
 const selectedBookInfo = computed(() => {
   if (!selectedBook.value) return null
 
@@ -42,7 +36,9 @@ const selectedBookInfo = computed(() => {
 
 const selectedChapterVerses = computed(() => {
   if (!selectedChapter.value) return 0
+
   const chapterData = chaptersWithVerses.value.find(c => c.number === selectedChapter.value)
+
   return chapterData?.verses_count ?? 0
 })
 
@@ -60,45 +56,65 @@ const canNavigate = computed(() => {
   return selectedBook.value !== null && selectedChapter.value !== null
 })
 
-// ===== FUNÇÕES AUXILIARES =====
+
+// Auto-selects the book if there is only one result in the search
+watch(filteredBooks, (books) => {
+  if (books.length === 1 && !selectedBook.value) {
+    const book = books[0]
+
+    if(!book) return
+
+    selectBook(book)
+  }
+})
 
 /**
- * Remove todos os caracteres não numéricos de uma string
+ * Opens the modal
  */
-const getNumericValue = (value: string): string => {
-  return value.replace(/\D/g, '')
+ const open = (initialChar?: string) => {
+  // Resets all fields
+  bookSearch.value = initialChar || ''
+  chapterSearch.value = ''
+  verseSearch.value = ''
+  clearBookSelection()
+  selectedChapter.value = null
+
+  dialogRef.value?.showModal()
+
+  // Focuses on the book field after opening
+  nextTick(() => bookInputRef.value?.focus())
 }
 
 /**
- * Foca em um input após o próximo tick
+ * Closes the modal
+ */
+const close = () => {
+  dialogRef.value?.close()
+}
+
+/**
+ * Focuses an input after the next tick
  */
 const focusInput = (ref: Ref<HTMLInputElement | null | undefined>) => {
   nextTick(() => ref.value?.focus())
 }
 
 /**
- * Move o foco para o campo de versículo e preenche com o valor
+ * Validates if a key is invalid for number input
  */
-const moveToVerse = (value: string) => {
-  nextTick(() => {
-    verseSearch.value = value
-    if (verseInputRef.value) {
-      verseInputRef.value.value = value
-      verseInputRef.value.focus()
-    }
-  })
+const isInvalidNumberKey = (key: string): boolean => {
+  return ['e', 'E', '+', '-', '.'].includes(key)
 }
 
 /**
- * Limpa a seleção de capítulo
+ * Clears the chapter selection
  */
 const clearChapterSelection = () => {
   selectedChapter.value = null
-  lastValidChapter.value = ''
 }
 
 /**
- * Limpa a seleção do livro e seus capítulos relacionados
+ * Clears the book selection and its related chapters
  */
 const clearBookSelection = () => {
   selectedBook.value = null
@@ -106,77 +122,67 @@ const clearBookSelection = () => {
 }
 
 /**
- * Valida se um número de capítulo é válido
- */
-const isValidChapter = (chapterNum: number, maxChapters: number): boolean => {
-  return chapterNum >= 1 && chapterNum <= maxChapters
-}
-
-/**
- * Verifica se um número pode ser parte de um número maior
- * Ex: se o usuário digitou "1" e o máximo é 50, pode ser "1", "10", "11", etc.
+ * Checks if a number can be part of a larger valid number
+ * Ex: if the user typed "1" and the max is 50, it can be "1", "10", "11", etc.
  */
 const canBePartOfLargerNumber = (chapterNum: number, maxChapters: number): boolean => {
   return (chapterNum * 10) <= maxChapters
 }
 
-// ===== LÓGICA DE CAPÍTULO =====
-
 /**
- * Processa a busca de capítulo e atualiza o estado
+ * Processes the chapter search and updates the state
  */
-const processChapterSearch = (search: string) => {
-  if (!selectedBookInfo.value || !search) {
-    clearChapterSelection()
-    return
+const processChapterSearch = (chapterNum: number | null) => {
+  if (!selectedBookInfo.value || chapterNum === null || chapterNum < 1) {
+    return clearChapterSelection()
   }
 
-  const chapterNum = parseInt(search)
   const maxChapters = selectedBookInfo.value.chapters
 
-  // Se não é um número válido, limpa a seleção
-  if (isNaN(chapterNum) || chapterNum < 1) {
-    clearChapterSelection()
-    return
-  }
+  if(chapterNum < 1 || chapterNum > maxChapters) return clearChapterSelection()
 
-  // Se o número é maior que o máximo, move os dígitos extras para o versículo
-  if (chapterNum > maxChapters) {
-    clearChapterSelection()
-    chapterSearch.value = ''
-    moveToVerse(search)
-    return
-  }
-
-  // Se o número é igual ao máximo, seleciona e move para o versículo
+  // If the number equals the maximum, selects and moves to verse
   if (chapterNum === maxChapters) {
     selectedChapter.value = chapterNum
-    lastValidChapter.value = search
-    focusInput(verseInputRef)
-    return
+
+    return focusInput(verseInputRef)
   }
 
-  // Capítulo válido
+  // Valid chapter
   selectedChapter.value = chapterNum
-  lastValidChapter.value = search
 
-  // Se não pode ser parte de um número maior, move o foco para o versículo
-  if (!canBePartOfLargerNumber(chapterNum, maxChapters)) {
-    nextTick(() => {
-      if (chapterSearch.value === search && selectedChapter.value === chapterNum) {
-        verseInputRef.value?.focus()
-      }
-    })
-  }
+  if(canBePartOfLargerNumber(chapterNum, maxChapters)) return
+
+  // If it cannot be part of a larger number, moves focus to verse
+  nextTick(() => focusInput(verseInputRef))
 }
 
-// ===== HANDLERS DE INPUT =====
+/**
+ * Processes the verse search and updates the state
+ */
+const processVerseSearch = (verseNum: number | null) => {
+  if (!selectedChapter.value || verseNum === null || verseNum < 1) return
+
+  // If the request hasn't finished yet, uses 176 as default
+  const maxVerses = selectedChapterVerses.value || 176
+
+  if(verseNum < 1 || verseNum > maxVerses) return
+
+  // If the number equals the maximum, keeps it selected
+  if (verseNum === maxVerses) {
+    return navigate()
+  }
+
+  if(canBePartOfLargerNumber(verseNum, maxVerses)) return
+
+  navigate()
+}
 
 /**
- * Handler do input de livro
+ * Handler for book input
  */
 const handleBookInput = () => {
-  // Se não há valor, limpa a seleção
+  // If there's no value, clears the selection
   if (!bookSearch.value) {
     clearBookSelection()
     return
@@ -189,70 +195,43 @@ const handleBookInput = () => {
   const normalizedInput = normalizeString(bookSearch.value)
   const normalizedBookName = normalizeString(selectedBookInfo.value.name)
 
-  // Se não corresponde mais, limpa a seleção
+  // If it no longer matches, clears the selection
   if (!normalizedBookName.startsWith(normalizedInput)) {
     clearBookSelection()
   }
 }
 
 /**
- * Handler do input de capítulo
+ * Handler for chapter input
  */
 const handleChapterInput = (e: Event) => {
-  const target = e.target as HTMLInputElement
-  const numericValue = getNumericValue(target.value)
+  const value = (e.target as HTMLInputElement).value
 
-  // Se não há livro selecionado, apenas atualiza o valor
-  if (!selectedBookInfo.value) {
-    chapterSearch.value = numericValue
-    target.value = numericValue
-    return
-  }
+  chapterSearch.value = value
 
-  const fullNumber = parseInt(numericValue)
-  const maxChapters = selectedBookInfo.value.chapters
+  const chapterNum = Number(value)
 
-  // Se o número completo é maior que o máximo e há um capítulo válido anterior,
-  // mantém o capítulo válido e move os dígitos extras para o versículo
-  if (!isNaN(fullNumber) && fullNumber > maxChapters && lastValidChapter.value && selectedChapter.value) {
-    const extraDigits = numericValue.slice(lastValidChapter.value.length)
-    chapterSearch.value = lastValidChapter.value
-    target.value = lastValidChapter.value
-    moveToVerse(extraDigits)
-    return
-  }
-
-  // Se o número é igual ao máximo mas tem dígitos extras, move os extras para o versículo
-  if (!isNaN(fullNumber) && fullNumber === maxChapters && numericValue.length > String(maxChapters).length) {
-    const extraDigits = numericValue.slice(String(maxChapters).length)
-    chapterSearch.value = String(maxChapters)
-    target.value = String(maxChapters)
-    moveToVerse(extraDigits)
-    return
-  }
-
-  // Atualiza o valor e processa a busca
-  chapterSearch.value = numericValue
-  target.value = numericValue
+  processChapterSearch(chapterNum)
 }
 
 /**
- * Handler do input de versículo
+ * Handler for verse input
  */
 const handleVerseInput = (e: Event) => {
-  const target = e.target as HTMLInputElement
-  const numericValue = getNumericValue(target.value)
-  verseSearch.value = numericValue
-  target.value = numericValue
+  const value = (e.target as HTMLInputElement).value
+
+  verseSearch.value = value
+
+  const verseNum = Number(value)
+
+  processVerseSearch(verseNum)
 }
 
-// ===== HANDLERS DE TECLADO =====
-
 /**
- * Handler de teclas no campo de livro
+ * Handler for keys in the book field
  */
 const handleBookKeydown = (e: KeyboardEvent) => {
-  // Enter ou Tab: seleciona o primeiro livro ou vai para o capítulo
+  // Enter or Tab: selects the first book or goes to chapter
   const firstBook = filteredBooks.value[0]
 
   if (firstBook) {
@@ -263,57 +242,50 @@ const handleBookKeydown = (e: KeyboardEvent) => {
 }
 
 /**
- * Handler de teclas no campo de capítulo
+ * Handler for keys in the chapter field
  */
 const handleChapterKeydown = (e: KeyboardEvent) => {
-  // Backspace vazio: volta para o livro
+  if (isInvalidNumberKey(e.key)) {
+    return e.preventDefault()
+  }
+
+  // Empty backspace: goes back to book
   if (!chapterSearch.value && e.key === 'Backspace' && selectedBook.value) {
     e.preventDefault()
-    bookInputRef.value?.select()
-    return
+
+    return bookInputRef.value?.select()
   }
 
-  // Enter: vai para o versículo
-  if (e.key === 'Enter') {
+  // Enter: goes to verse
+  if (e.key === 'Enter' && chapterSearch.value) {
     e.preventDefault()
-    if (selectedChapter.value || chapterSearch.value) {
-      verseInputRef.value?.focus()
-    }
-  }
-
-  // Escape: fecha o modal
-  if (e.key === 'Escape') {
-    close()
+    verseInputRef.value?.focus()
   }
 }
 
 /**
- * Handler de teclas no campo de versículo
+ * Handler for keys in the verse field
  */
 const handleVerseKeydown = (e: KeyboardEvent) => {
-  // Backspace vazio: volta para o capítulo
+  if (isInvalidNumberKey(e.key)) {
+    return e.preventDefault()
+  }
+
+  // Empty backspace: goes back to chapter
   if (!verseSearch.value && e.key === 'Backspace' && selectedChapter.value) {
     e.preventDefault()
-    chapterInputRef.value?.select()
-    return
+    return chapterInputRef.value?.select()
   }
 
-  // Enter: navega para a referência
+  // Enter: navigates to the reference
   if (e.key === 'Enter') {
     e.preventDefault()
-    navigate()
-  }
-
-  // Escape: fecha o modal
-  if (e.key === 'Escape') {
-    close()
+    return navigate()
   }
 }
 
-// ===== FUNÇÕES PRINCIPAIS =====
-
 /**
- * Carrega os capítulos com versículos do livro selecionado
+ * Loads chapters with verses from the selected book
  */
 const loadChaptersWithVerses = (book: BookNameType) => {
   if (!versionStore.currentVersion) return
@@ -329,86 +301,38 @@ const loadChaptersWithVerses = (book: BookNameType) => {
 }
 
 /**
- * Seleciona um livro
+ * Selects a book
  */
 const selectBook = (book: { key: BookNameType; info: BookInfo }) => {
   selectedBook.value = book.key
   bookSearch.value = book.info.name
-  chaptersWithVerses.value = [] // Limpa antes de carregar novos
+  chaptersWithVerses.value = [] // Clears before loading new ones
 
-  loadChaptersWithVerses(book.key)
-  focusInput(chapterInputRef)
+  // If the book has only 1 chapter, selects it automatically
+  if (book.info.chapters === 1) {
+    selectedChapter.value = 1
+    chapterSearch.value = '1'
+    loadChaptersWithVerses(book.key)
+    focusInput(verseInputRef)
+  } else {
+    loadChaptersWithVerses(book.key)
+    focusInput(chapterInputRef)
+  }
 }
 
 /**
- * Abre o modal
- */
-const open = (initialChar?: string) => {
-  // Reseta todos os campos
-  bookSearch.value = initialChar || ''
-  chapterSearch.value = ''
-  verseSearch.value = ''
-  clearBookSelection()
-  selectedChapter.value = null
-
-  dialogRef.value?.showModal()
-
-  // Foca no campo de livro após abrir
-  nextTick(() => {
-    bookInputRef.value?.focus()
-    if (bookInputRef.value && initialChar) {
-      const length = bookInputRef.value.value.length
-      bookInputRef.value.setSelectionRange(length, length)
-    }
-  })
-}
-
-/**
- * Fecha o modal
- */
-const close = () => {
-  dialogRef.value?.close()
-  
-  // Limpa os campos após a animação
-  setTimeout(() => {
-    bookSearch.value = ''
-    chapterSearch.value = ''
-    verseSearch.value = ''
-    clearBookSelection()
-    selectedChapter.value = null
-  }, 200)
-}
-
-/**
- * Navega para a referência bíblica selecionada
+ * Navigates to the selected biblical reference
  */
 const navigate = () => {
   if (!selectedBook.value || !selectedChapter.value) return
 
-  const verse = verseSearch.value ? parseInt(verseSearch.value) : undefined
+  const verse = parseInt(verseSearch.value)
+
   goToChapter(selectedBook.value, selectedChapter.value, verse)
+
   close()
 }
 
-// ===== WATCHERS =====
-
-// Auto-seleciona o livro se houver apenas um resultado na busca
-watch(filteredBooks, (books) => {
-  if (books.length === 1 && !selectedBook.value) {
-    const book = books[0]
-
-    if(!book) return
-
-    selectBook(book)
-  }
-})
-
-// Processa a busca de capítulo quando o valor muda
-watch(chapterSearch, (search) => {
-  processChapterSearch(search)
-})
-
-// ===== EXPOSE =====
 defineExpose({
   open
 })
@@ -421,7 +345,7 @@ defineExpose({
     @click.self="close"
   >
     <div class="modal-box max-w-2xl sm:rounded-lg max-sm:max-w-full max-sm:h-[calc(100vh-4rem)] max-sm:mb-0 max-sm:mt-16 max-sm:rounded-b-none">
-      <!-- Cabeçalho -->
+      <!-- Header -->
       <div class="flex items-center justify-between mb-4">
         <h3 class="font-bold text-lg">
           Pesquisar Referência Bíblica
@@ -434,9 +358,9 @@ defineExpose({
         </button>
       </div>
 
-      <!-- Campos de busca -->
+      <!-- Search fields -->
       <div class="space-y-4">
-        <!-- Campo de Livro -->
+        <!-- Book field -->
         <div class="form-control">
           <label class="label">
             <span class="label-text font-semibold">Livro</span>
@@ -452,7 +376,7 @@ defineExpose({
               @keydown.enter.prevent="handleBookKeydown"
               @keydown.tab.prevent="handleBookKeydown"
             />
-            <!-- Lista de sugestões -->
+            <!-- Suggestions list -->
             <div
               v-if="bookSearch && filteredBooks.length > 0 && !selectedBook"
               class="absolute z-10 w-full mt-1 bg-base-100 border border-base-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
@@ -469,7 +393,7 @@ defineExpose({
           </div>
         </div>
 
-        <!-- Campo de Capítulo -->
+        <!-- Chapter field -->
         <div class="form-control">
           <label class="label">
             <span class="label-text font-semibold">Capítulo</span>
@@ -479,18 +403,19 @@ defineExpose({
           </label>
           <input
             ref="chapterInputRef"
-            :value="chapterSearch"
-            type="text"
-            inputmode="numeric"
-            :placeholder="selectedBookInfo ? `Digite o capítulo (1-${selectedBookInfo.chapters})...` : 'Selecione um livro primeiro'"
+            type="number"
             class="input input-bordered w-full"
+            :value="chapterSearch"
+            :min="1"
+            :max="selectedBookInfo?.chapters"
+            :placeholder="selectedBookInfo ? `Digite o capítulo (1-${selectedBookInfo.chapters})...` : 'Selecione um livro primeiro'"
             :disabled="!selectedBook"
             @input="handleChapterInput"
             @keydown="handleChapterKeydown"
           />
         </div>
 
-        <!-- Campo de Versículo -->
+        <!-- Verse field -->
         <div class="form-control">
           <label class="label">
             <span class="label-text font-semibold">Versículo (opcional)</span>
@@ -500,11 +425,12 @@ defineExpose({
           </label>
           <input
             ref="verseInputRef"
-            :value="verseSearch"
-            type="text"
-            inputmode="numeric"
-            :placeholder="selectedChapter ? `Digite o versículo (1-${selectedChapterVerses})...` : 'Selecione um capítulo primeiro'"
+            type="number"
             class="input input-bordered w-full"
+            :value="verseSearch"
+            :min="1"
+            :max="selectedChapterVerses || 176"
+            :placeholder="selectedChapter ? `Digite o versículo (1-${selectedChapterVerses || 176})...` : 'Selecione um capítulo primeiro'"
             :disabled="!selectedChapter"
             @input="handleVerseInput"
             @keydown="handleVerseKeydown"
@@ -512,7 +438,7 @@ defineExpose({
         </div>
       </div>
 
-      <!-- Ações -->
+      <!-- Actions -->
       <div class="modal-action">
         <button
           class="btn btn-ghost"

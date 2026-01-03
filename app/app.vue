@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const searchModalRef = useTemplateRef<{ open: (char?: string) => void }>('searchModalRef')
+const searchModalRef = useTemplateRef('searchModalRef')
 
 const handleKeydown = (e: KeyboardEvent) => {
   if (isInputFocused()) return
