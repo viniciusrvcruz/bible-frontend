@@ -45,6 +45,11 @@ const bibleLink = computed(() =>
           </ul>
         </div>
 
+        <div class="hidden sm:flex items-center text-xs text-base-content/70 ms-4">
+          <Icon icon="keyboard" :size="16" class="me-1" />
+          <span>Digite qualquer letra para pesquisar</span>
+        </div>
+
         <ul class="menu menu-horizontal gap-2 items-center">
           <li>
             <button v-tooltip.bottom="'Ajuda'" class="p-2">
