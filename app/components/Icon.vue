@@ -26,6 +26,7 @@ const ICON_MAP = {
   close: 'lucide:x',
   github: 'simple-icons:github',
   linkedin: 'simple-icons:linkedin',
+  keyboard: 'lucide:keyboard',
 } as const
 
 </script>
