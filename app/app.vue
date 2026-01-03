@@ -4,6 +4,8 @@ const searchModalRef = useTemplateRef('searchModalRef')
 const handleKeydown = (e: KeyboardEvent) => {
   if (isInputFocused()) return
 
+  if (e.ctrlKey || e.altKey || e.shiftKey || e.metaKey) return
+
   const char = e.key
   if (char.length === 1 && /[a-zA-Z1-3]/.test(char)) {
     e.preventDefault()

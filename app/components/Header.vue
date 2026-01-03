@@ -36,12 +36,6 @@ const bibleLink = computed(() =>
                 Bíblia
               </RouterLink>
             </li>
-            <li>
-              <a>
-                <Icon icon="document" :size="20" />
-                Navbar Item 2
-              </a>
-            </li>
           </ul>
         </div>
 
@@ -52,9 +46,13 @@ const bibleLink = computed(() =>
 
         <ul class="menu menu-horizontal gap-2 items-center">
           <li>
-            <button v-tooltip.bottom="'Ajuda'" class="p-2">
+            <RouterLink
+              to="/help"
+              v-tooltip.bottom="'Ajuda'"
+              class="p-2"
+            >
               <Icon icon="circle_question" :size="22" />
-            </button>
+            </RouterLink>
           </li>
           <li>
             <button v-tooltip.bottom="'Temas'" class="p-2" @click="themeSelectorPopoverRef.toggle">
@@ -78,12 +76,6 @@ const bibleLink = computed(() =>
             <Icon icon="book_open" :size="20" />
             Bíblia
           </RouterLink>
-        </li>
-        <li>
-          <a>
-            <Icon icon="document" :size="20" />
-            Navbar Item 2
-          </a>
         </li>
       </ul>
     </div>

@@ -27,6 +27,11 @@ const ICON_MAP = {
   github: 'simple-icons:github',
   linkedin: 'simple-icons:linkedin',
   keyboard: 'lucide:keyboard',
+  rocket: 'lucide:rocket',
+  bookmark: 'lucide:bookmark',
+  compare: 'lucide:git-compare',
+  copy: 'lucide:copy',
+  info: 'lucide:info',
 } as const
 
 </script>
