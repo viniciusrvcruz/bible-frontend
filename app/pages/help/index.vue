@@ -66,13 +66,11 @@ const navigationItems = [
         </a>
       </div>
 
-      <!-- Feedback Form Section - Moved to top -->
-      <HelpSuggestionsBugs />
-
       <!-- Main Content -->
       <div class="space-y-8">
-        <HelpSearch />
+        <HelpSuggestionsBugs />
         <HelpCustomization />
+        <HelpSearch />
         <HelpFAQ />
         <HelpFutureFeatures />
       </div>

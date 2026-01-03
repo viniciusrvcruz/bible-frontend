@@ -10,24 +10,15 @@
           Tem uma sugestão de melhoria ou encontrou um bug? Use o formulário abaixo para nos enviar seu feedback.
           Sua opinião nos ajuda a tornar a aplicação melhor!
         </p>
-        
-        <div class="border-2 border-dashed border-base-300 rounded-lg p-4 bg-base-100">
-          <p class="text-sm text-base-content/70 mb-4 text-center">
-            O formulário será exibido aqui
-          </p>
-          <!-- Placeholder for iframe - Replace src with your actual form URL -->
-          <div class="w-full" style="min-height: 600px;">
-            <iframe
-              src=""
-              class="w-full h-full min-h-[600px] border-0 rounded-lg"
-              title="Formulário de Feedback"
-              loading="lazy"
-            />
-          </div>
-          <p class="text-xs text-base-content/60 mt-4 text-center">
-            Substitua o atributo <code>src</code> vazio acima pela URL do seu formulário iframe
-          </p>
-        </div>
+
+        <iframe
+          src="https://gem-steed-cd0.notion.site/ebd//2dd15cd5db8c80c6b62fcf1f32874a64"
+          width="100%"
+          height="1000"
+          frameborder="0"
+          allowfullscreen
+          class="rounded-2xl"
+        />
       </div>
     </div>
   </section>

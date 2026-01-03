@@ -59,7 +59,11 @@
         <div class="alert alert-info mt-4">
           <Icon icon="info" :size="20" />
           <span class="text-sm">
-            Quer sugerir uma nova funcionalidade? Use o formulário de feedback acima para nos enviar suas ideias!
+            Quer sugerir uma nova funcionalidade?
+            <a href="#suggestions-bugs" class="link link-primary">
+              Use o formulário de feedback
+            </a>
+            para nos enviar suas ideias!
           </span>
         </div>
       </div>
