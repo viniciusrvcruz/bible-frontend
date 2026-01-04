@@ -72,14 +72,34 @@ const bibleLink = computed(() =>
 
     <div class="drawer-side">
       <label for="drawer" aria-label="close sidebar" class="drawer-overlay" />
-      <ul class="menu bg-base-200 min-h-full w-60 md:w-80 p-4">
-        <li>
-          <RouterLink :to="bibleLink" @click="closeDrawer">
+      <aside class="menu bg-base-200 min-h-full w-60 md:w-80 flex flex-col">
+        <div class="flex justify-between items-center p-4 pb-2">
+          <RouterLink to="/" @click="closeDrawer">
+            <Icon icon="book_marked" :size="34" />
+          </RouterLink>
+          <label 
+            for="drawer" 
+            aria-label="close sidebar" 
+            class="btn btn-ghost btn-sm btn-circle"
+          >
+            <Icon icon="close" :size="20" />
+          </label>
+        </div>
+        <div class="flex-1 flex flex-col gap-2 overflow-y-auto px-4 py-4 border-t border-base-300">
+          <RouterLink 
+            :to="bibleLink" 
+            @click="closeDrawer" 
+            class="btn btn-ghost justify-start w-full text-base"
+          >
             <Icon icon="book_open" :size="20" />
             Bíblia
           </RouterLink>
-        </li>
-      </ul>
+        </div>
+
+        <div class="p-4 pt-6 border-t border-base-300 text-center text-sm text-base-content/70">
+          <SharedSocialLinks remove-separators :icon-size="18" />
+        </div>
+      </aside>
     </div>
 
     <ThemeSelectorPopover ref="themeSelectorPopoverRef" />
