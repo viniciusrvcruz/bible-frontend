@@ -31,7 +31,9 @@ const bibleLink = computed(() =>
         </div>
 
         <div class="hidden flex-none justify-between items-center lg:flex">
-          <Icon icon="book_marked" :size="30" />
+          <RouterLink to="/" class="flex items-center">
+            <Icon icon="book_marked" :size="30" />
+          </RouterLink>
 
           <ul class="menu menu-horizontal gap-2 ms-5">
             <li>
