@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import ThemeSelectorPopover from './ThemeSelectorPopover.vue'
+import UserDropdown from './UserDropdown.vue'
+
 const route = useRoute()
 
 const themeSelectorPopoverRef = useTemplateRef('themeSelectorPopoverRef')
@@ -47,11 +50,7 @@ const bibleLink = computed(() =>
 
         <ul class="menu menu-horizontal gap-2 items-center">
           <li>
-            <RouterLink
-              to="/help"
-              v-tooltip.bottom="'Ajuda'"
-              class="p-2"
-            >
+            <RouterLink to="/help" v-tooltip.bottom="'Ajuda'" class="p-2">
               <Icon icon="circle_question" :size="22" />
             </RouterLink>
           </li>
@@ -61,10 +60,7 @@ const bibleLink = computed(() =>
             </button>
           </li>
           <li class="ms-2">
-            <button 
-              class="rounded-full p-3 bg-base-100" 
-              @click="userDropdownRef?.toggle"
-            >
+            <button class="rounded-full p-3 bg-base-100" @click="userDropdownRef?.toggle">
               <Icon icon="user" :size="22" />
             </button>
           </li>
