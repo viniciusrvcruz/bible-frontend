@@ -25,6 +25,8 @@ export const useChapterHistory = () => {
   const addToHistory = (item: ChapterHistory) => {
     if (!import.meta.client) return
 
+    loadHistory()
+
     chapterHistory.value.unshift(item)
     chapterHistory.value = chapterHistory.value.slice(0, MAX_HISTORY_ITEMS)
 
