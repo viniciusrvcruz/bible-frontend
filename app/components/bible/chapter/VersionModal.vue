@@ -21,8 +21,8 @@ const filteredVersions = computed(() => {
   const searchValue = versionSearch.value.toLowerCase()
 
   return versionStore.versions.filter(v => 
-    v.name.toLowerCase().includes(searchValue) || 
-    v.full_name.toLowerCase().includes(searchValue)
+    v.abbreviation.toLowerCase().includes(searchValue) || 
+    v.name.toLowerCase().includes(searchValue)
   )
 })
 
@@ -71,7 +71,7 @@ defineExpose({
             Versão Atual
           </div>
           <div class="text-sm">
-            {{ versionStore.currentVersion.name }} - {{ versionStore.currentVersion.full_name }}
+            {{ versionStore.currentVersion.abbreviation }} - {{ versionStore.currentVersion.name }}
           </div>
         </div>
       </div>
@@ -100,8 +100,8 @@ defineExpose({
           @click="selectVersion(version)"
         >
           <div class="flex-1">
-            <div class="font-semibold">{{ version.name }}</div>
-            <div class="text-sm text-base-content/70">{{ version.full_name }}</div>
+            <div class="font-semibold">{{ version.abbreviation }}</div>
+            <div class="text-sm text-base-content/70">{{ version.name }}</div>
             <div class="text-xs text-base-content/50 mt-1">
               {{ languageNames[version.language] || version.language }}
             </div>

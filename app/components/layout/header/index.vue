@@ -96,8 +96,12 @@ const bibleLink = computed(() =>
           </RouterLink>
         </div>
 
-        <div class="p-4 pt-6 border-t border-base-300 text-center text-sm text-base-content/70">
-          <SharedSocialLinks remove-separators :icon-size="18" />
+        <div class="p-4 pt-6 border-t border-base-300 text-start text-sm text-base-content/70 md:text-center">
+          <SharedSocialLinks
+            class="justify-start md:justify-center"
+            remove-separators
+            :icon-size="18"
+          />
         </div>
       </aside>
     </div>

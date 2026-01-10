@@ -3,13 +3,14 @@ import type { Chapter } from '~/types/chapter/Chapter.type'
 import type { Version } from '~/types/version/Version.type'
 import { useVerseFocus } from '~/composables/bible/useVerseFocus'
 import { useChapterHistory } from '~/composables/bible/useChapterHistory'
+import { useBookService } from '~/composables/services/useBookService'
 
 const props = defineProps<{
   chapter: Chapter
 }>()
 
 const route = useRoute()
-const { goToChapter } = useNavigateToBible()
+const { goToChapter, getChapterUrl } = useNavigateToBible()
 const versionStore = useVersionStore()
 const { addToHistory } = useChapterHistory()
 
@@ -19,13 +20,53 @@ const fontSize = useCookie<string>('bible-font-size', { default: () => 'text-lg'
 const fontFamily = useCookie<string>('bible-font-family', { default: () => 'font-sans' })
 
 const bookName = computed(() => {
-  return getBookInfo(props.chapter.book.name).name
+  return props.chapter.book.name
 })
 
 const verseNumber = computed(() => {
   if (!route.hash) return null
 
   return parseInt(route.hash.slice(2))
+})
+
+// Returns the index of the current chapter
+const currentChapterIndex = computed(() => {
+  return versionStore.allChapters.findIndex(
+    chapter => 
+      chapter.book.abbreviation === props.chapter.book.abbreviation &&
+      chapter.number === props.chapter.number
+  )
+})
+
+// Returns the chapter by index
+const getChapterByIndex = (index: number) => {
+  return versionStore.allChapters[index] ?? null
+}
+
+// Returns the link for the previous chapter
+const previousChapterLink = computed(() => {
+  if (currentChapterIndex.value === -1) return null
+  
+  const previousChapter = getChapterByIndex(currentChapterIndex.value - 1)
+  if (!previousChapter) return null
+  
+  return getChapterUrl(
+    previousChapter.book.abbreviation,
+    previousChapter.number
+  )
+})
+
+// Returns the link for the next chapter
+const nextChapterLink = computed(() => {
+  if (currentChapterIndex.value === -1) return null
+  
+  const nextChapter = getChapterByIndex(currentChapterIndex.value + 1)
+  if (!nextChapter) return null
+  
+  return getChapterUrl(
+    nextChapter.book.abbreviation,
+    nextChapter.number
+  )
 })
 
 const clearHash = () => {
@@ -51,31 +92,25 @@ const addCurrentChapterToHistory = () => {
   const verseNumber = route.hash ? parseInt(route.hash.slice(2)) : undefined
 
   addToHistory({
-    book: props.chapter.book.name,
+    book: props.chapter.book.abbreviation,
     chapter: props.chapter.number,
     verse: verseNumber,
-    versionName: versionStore.currentVersion?.name ?? '',
+    versionName: versionStore.currentVersion?.abbreviation ?? '',
     timestamp: Date.now()
   })
 }
 
 const handleVersionSelect = async (version: Version) => {
+  const bookService = useBookService()
+
   versionStore.setCurrentVersion(version)
+  // Load books for the new version
+  const books = await bookService.index(version.id)
+  versionStore.setCurrentVersionBooks(books)
 
-  await goToChapter(props.chapter.book.name, props.chapter.number)
+  await goToChapter(props.chapter.book.abbreviation, props.chapter.number)
 }
 
-const goToPreviousChapter = () => {
-  if (!props.chapter.previous) return
-
-  goToChapter(props.chapter.previous.book.name, props.chapter.previous.number)
-}
-
-const goToNextChapter = () => {
-  if (!props.chapter.next) return
-
-  goToChapter(props.chapter.next.book.name, props.chapter.next.number)
-}
 
 </script>
 
@@ -142,13 +177,13 @@ const goToNextChapter = () => {
 
       <!-- Navigation buttons -->
       <div class="flex justify-between sticky bottom-0 w-full pointer-events-none z-2">
-        <button
-          v-if="chapter.previous"
+        <RouterLink
+          v-if="previousChapterLink"
+          :to="previousChapterLink"
           class="btn btn-xl btn-circle mb-15 ms-5 border-2 border-base-300 shadow-sm pointer-events-auto lg:ms-10 lg:mb-40"
-          @click="goToPreviousChapter"
         >
           <Icon icon="chevron_left" />
-        </button>
+        </RouterLink>
   
         <label
           for="select_verse_modal"
@@ -157,13 +192,13 @@ const goToNextChapter = () => {
           {{ bookName }} {{ chapter.number }}
         </label>
 
-        <button
-          v-if="chapter.next"
+        <RouterLink
+          v-if="nextChapterLink"
+          :to="nextChapterLink"
           class="btn btn-xl btn-circle mb-15 me-5 border-2 border-base-300 shadow-sm pointer-events-auto lg:me-10 lg:ms-auto lg:mb-40"
-          @click="goToNextChapter"
         >
           <Icon icon="chevron_right" />
-        </button>
+        </RouterLink>
       </div>
     </div>
   </section>

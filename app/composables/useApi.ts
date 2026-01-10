@@ -31,6 +31,7 @@ export const useApi = () => {
         : data
           ? { body: data }
           : {}),
+      retry: 0,
       ...options,
     })
   }

@@ -52,7 +52,7 @@ const handleVersionSelect = (version: Version) => {
       >
         <Icon icon="globe" :size="20" />
         <span class="font-bold">
-          {{ versionStore.currentVersion?.name ?? '-' }}
+          {{ versionStore.currentVersion?.abbreviation ?? '-' }}
         </span>
       </button>
     </div>

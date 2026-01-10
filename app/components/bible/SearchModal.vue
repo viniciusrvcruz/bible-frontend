@@ -1,18 +1,10 @@
 <script setup lang="ts">
-import type { BookNameType } from '~/utils/book'
-import type { BookInfo } from '~/types/book/Book.type'
-import { getAllBooks, getBookInfo } from '~/utils/book'
+import type { BookAbbreviationType } from '~/utils/book'
+import type { BookWithChapters } from '~/types/book/Book.type'
 import { normalizeString } from '~/utils/helpers'
 import { useNavigateToBible } from '~/composables/useNavigateToBible'
-import { useChapterService } from '~/composables/services/useChapterService'
-
-interface ChapterVerses {
-  number: number
-  verses_count: number
-}
 
 const { goToChapter } = useNavigateToBible()
-const chapterService = useChapterService()
 const versionStore = useVersionStore()
 
 const dialogRef = useTemplateRef<HTMLDialogElement>('dialogRef')
@@ -24,22 +16,25 @@ const bookSearch = ref('')
 const chapterSearch = ref('')
 const verseSearch = ref('')
 
-const selectedBook = ref<BookNameType | null>(null)
+const selectedBook = ref<BookAbbreviationType | null>(null)
 const selectedChapter = ref<number | null>(null)
-const chaptersWithVerses = ref<ChapterVerses[]>([])
 
-const selectedBookInfo = computed(() => {
+const selectedBookData = computed(() => {
   if (!selectedBook.value) return null
 
-  return getBookInfo(selectedBook.value)
+  return versionStore.getBookByAbbreviation(selectedBook.value) ?? null
+})
+
+const selectedChapterData = computed(() => {
+  if (!selectedChapter.value || !selectedBookData.value) return null
+
+  return selectedBookData.value.chapters.find(
+    c => c.number === selectedChapter.value
+  ) ?? null
 })
 
 const selectedChapterVerses = computed(() => {
-  if (!selectedChapter.value) return 0
-
-  const chapterData = chaptersWithVerses.value.find(c => c.number === selectedChapter.value)
-
-  return chapterData?.verses_count ?? 0
+  return selectedChapterData.value?.verses_count ?? 0
 })
 
 const filteredBooks = computed(() => {
@@ -47,8 +42,8 @@ const filteredBooks = computed(() => {
 
   const normalizedSearch = normalizeString(bookSearch.value)
 
-  return getAllBooks()
-    .filter(({ info }) => normalizeString(info.name).startsWith(normalizedSearch))
+  return versionStore.currentVersionBooks
+    .filter(book => normalizeString(book.name).startsWith(normalizedSearch))
     .slice(0, 10)
 })
 
@@ -118,7 +113,6 @@ const clearChapterSelection = () => {
  */
 const clearBookSelection = () => {
   selectedBook.value = null
-  chaptersWithVerses.value = []
 }
 
 /**
@@ -133,11 +127,11 @@ const canBePartOfLargerNumber = (chapterNum: number, maxChapters: number): boole
  * Processes the chapter search and updates the state
  */
 const processChapterSearch = (chapterNum: number | null) => {
-  if (!selectedBookInfo.value || chapterNum === null || chapterNum < 1) {
+  if (!selectedBookData.value || chapterNum === null || chapterNum < 1) {
     return clearChapterSelection()
   }
 
-  const maxChapters = selectedBookInfo.value.chapters
+  const maxChapters = selectedBookData.value.chapters.length
 
   if(chapterNum < 1 || chapterNum > maxChapters) return clearChapterSelection()
 
@@ -188,12 +182,10 @@ const handleBookInput = () => {
     return
   }
 
-  const hasSelectedBook = selectedBook.value && selectedBookInfo.value
-
-  if(!hasSelectedBook) return
+  if(!selectedBookData.value) return
 
   const normalizedInput = normalizeString(bookSearch.value)
-  const normalizedBookName = normalizeString(selectedBookInfo.value.name)
+  const normalizedBookName = normalizeString(selectedBookData.value.name)
 
   // If it no longer matches, clears the selection
   if (!normalizedBookName.startsWith(normalizedInput)) {
@@ -285,37 +277,20 @@ const handleVerseKeydown = (e: KeyboardEvent) => {
 }
 
 /**
- * Loads chapters with verses from the selected book
- */
-const loadChaptersWithVerses = (book: BookNameType) => {
-  if (!versionStore.currentVersion) return
-
-  chapterService.index(book, versionStore.currentVersion.id)
-    .then(chapters => {
-      chaptersWithVerses.value = chapters.map(c => ({
-        number: c.number,
-        verses_count: c.verses_count
-      }))
-    })
-    .catch(console.error)
-}
-
-/**
  * Selects a book
  */
-const selectBook = (book: { key: BookNameType; info: BookInfo }) => {
-  selectedBook.value = book.key
-  bookSearch.value = book.info.name
-  chaptersWithVerses.value = [] // Clears before loading new ones
+const selectBook = (book: BookWithChapters | undefined) => {
+  if (!book) return
+
+  selectedBook.value = book.abbreviation
+  bookSearch.value = book.name
 
   // If the book has only 1 chapter, selects it automatically
-  if (book.info.chapters === 1) {
+  if (book.chapters.length === 1) {
     selectedChapter.value = 1
     chapterSearch.value = '1'
-    loadChaptersWithVerses(book.key)
     focusInput(verseInputRef)
   } else {
-    loadChaptersWithVerses(book.key)
     focusInput(chapterInputRef)
   }
 }
@@ -383,11 +358,11 @@ defineExpose({
             >
               <button
                 v-for="book in filteredBooks"
-                :key="book.key"
+                :key="book.abbreviation"
                 class="w-full text-left px-4 py-2 hover:bg-base-200 transition-colors"
                 @click="selectBook(book)"
               >
-                {{ book.info.name }}
+                {{ book.name }}
               </button>
             </div>
           </div>
@@ -397,8 +372,8 @@ defineExpose({
         <div class="form-control">
           <label class="label">
             <span class="label-text font-semibold">Capítulo</span>
-            <span v-if="selectedBookInfo" class="label-text-alt text-base-content/60">
-              (máx: {{ selectedBookInfo.chapters }})
+            <span v-if="selectedBookData" class="label-text-alt text-base-content/60">
+              (máx: {{ selectedBookData.chapters.length }})
             </span>
           </label>
           <input
@@ -407,8 +382,8 @@ defineExpose({
             class="input input-bordered w-full"
             :value="chapterSearch"
             :min="1"
-            :max="selectedBookInfo?.chapters"
-            :placeholder="selectedBookInfo ? `Digite o capítulo (1-${selectedBookInfo.chapters})...` : 'Selecione um livro primeiro'"
+            :max="selectedBookData?.chapters.length"
+            :placeholder="selectedBookData ? `Digite o capítulo (1-${selectedBookData.chapters.length})...` : 'Selecione um livro primeiro'"
             :disabled="!selectedBook"
             @input="handleChapterInput"
             @keydown="handleChapterKeydown"

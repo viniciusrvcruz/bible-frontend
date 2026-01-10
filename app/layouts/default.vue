@@ -1,14 +1,27 @@
 <script setup lang="ts">
 import { useVersionService } from '~/composables/services/useVersionService'
+import { useBookService } from '~/composables/services/useBookService'
 
 const versionStore = useVersionStore()
 const versionService = useVersionService()
+const bookService = useBookService()
 
-const { data: versions } = await versionService.index()
+const { data: versions } = await versionService.useIndex()
 
-if (versions.value?.length) {
-  versionStore.setVersions(versions.value)
+if (!versions.value) {
+  throw createAppError('As versões não foram encontradas')
 }
+
+versionStore.setVersions(versions.value)
+
+// Load books for current version
+const { data: books } = await bookService.useIndex(versionStore.currentVersion!.id)
+
+if (!books.value) {
+  throw createAppError('Os livros não foram encontrados')
+}
+
+versionStore.setCurrentVersionBooks(books.value)
 
 const searchModalRef = useTemplateRef('searchModalRef')
 
