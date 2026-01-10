@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { VerseSelection } from '~/types/verse/Verse.type'
-import type { BookNameType } from '~/utils/book'
+import type { BookAbbreviationType } from '~/utils/book'
 
 defineProps<{
-  currentBook?: BookNameType | null
+  currentBook?: BookAbbreviationType | null
 }>()
 
 const { goToChapter } = useNavigateToBible()

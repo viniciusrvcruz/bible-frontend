@@ -1,20 +1,14 @@
 <script setup lang="ts">
-import type { BookNameType } from '~/utils/book'
+import type { BookAbbreviationType } from '~/utils/book'
 import type { ChapterSelection } from '~/types/chapter/Chapter.type'
 import type { VerseSelection } from '~/types/verse/Verse.type'
-import { useChapterService } from '~/composables/services/useChapterService'
+import { normalizeString } from '~/utils/helpers'
 
-interface ChapterVerses {
-  number: number
-  verses_count: number
-}
-
-const chapterService = useChapterService()
 const versionStore = useVersionStore()
 
 interface Props {
   selectVerse?: boolean
-  currentBook?: BookNameType | null
+  currentBook?: BookAbbreviationType | null
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -27,56 +21,47 @@ const emit = defineEmits<{
 }>()
 
 const search = ref('')
-const selectedBook = ref<BookNameType | null>(null)
+const selectedBook = ref<BookAbbreviationType | null>(null)
 const selectedChapter = ref<number | null>(null)
-const chaptersWithVerses = ref<ChapterVerses[]>([])
 const selectionContainerRef = ref<HTMLElement | null>(null)
 
-const selectedBookInfo = computed(() => {
+const selectedBookData = computed(() => {
   if (!selectedBook.value) return null
 
-  return getBookInfo(selectedBook.value)
+  return versionStore.getBookByAbbreviation(selectedBook.value) ?? null
+})
+
+const selectedChapterData = computed(() => {
+  if (!selectedChapter.value || !selectedBookData.value) return null
+
+  return selectedBookData.value.chapters.find(
+    c => c.number === selectedChapter.value
+  ) ?? null
 })
 
 const selectedChapterVerses = computed(() => {
-  if (!selectedChapter.value) return 0
-
-  const chapterData = chaptersWithVerses.value.find(c => c.number === selectedChapter.value)
-  return chapterData?.verses_count ?? 0
+  return selectedChapterData.value?.verses_count ?? 0
 })
 
 const filteredBooks = computed(() => {
   const normalizedSearch = normalizeString(search.value)
 
-  return getAllBooks()
-    .filter(({ info }) => normalizeString(info.name).includes(normalizedSearch))
+  return versionStore.currentVersionBooks
+    .filter(book => normalizeString(book.name).includes(normalizedSearch))
 })
-
-const getChaptersWithVerses = async (book: BookNameType) => {
-  if (!versionStore.currentVersion) return
-
-  chapterService.index(book, versionStore.currentVersion.id)
-    .then(chapters => {
-      chaptersWithVerses.value = chapters
-    })
-    .catch(console.error)
-}
 
 const scrollToTop = (top = 0) => {
   selectionContainerRef.value?.scrollTo({ top })
 }
 
-const selectBook = (key: BookNameType) => {
+const selectBook = (key: BookAbbreviationType) => {
   selectedBook.value = key
   scrollToTop()
-
-  if (props.selectVerse) {
-    getChaptersWithVerses(key)
-  }
 }
 
 const selectChapter = (chapter: number) => {
   if (!selectedBook.value) return
+
   scrollToTop()
 
   if (props.selectVerse) {
@@ -115,13 +100,11 @@ const goBack = () => {
   }
 
   selectedBook.value = null
-  chaptersWithVerses.value = []
 }
 
 const resetSelection = () => {
   selectedBook.value = null
   selectedChapter.value = null
-  chaptersWithVerses.value = []
 }
 
 const scrollToCurrentBook = () => {
@@ -160,48 +143,48 @@ defineExpose({
       <div class="flex flex-col gap-3 md:gap-2 text-start">
         <button
           v-for="book in filteredBooks"
-          :key="book.key"
+          :key="book.abbreviation"
           class="btn btn-ghost justify-start text-base w-full lg:text-sm xl:text-base"
-          :class="{ 'btn-active': currentBook === book.key }"
-          @click="selectBook(book.key)"
+          :class="{ 'btn-active': currentBook === book.abbreviation }"
+          @click="selectBook(book.abbreviation)"
         >
-          {{ book.info.name }}
+          {{ book.name }}
         </button>
       </div>
     </template>
 
     <!-- Chapter selection view -->
-    <template v-else-if="selectedBookInfo && !selectedChapter">
+    <template v-else-if="selectedBookData && !selectedChapter">
       <div class="pt-5 bg-base-100 sticky top-0 z-10">
         <button
           class="btn btn-ghost w-full justify-start text-lg font-bold mb-2"
           @click="goBack"
         >
           <Icon icon="chevron_left" :size="20" />
-          {{ selectedBookInfo.name }}
+          {{ selectedBookData.name }}
         </button>
       </div>
       <div class="flex flex-wrap gap-2">
         <button
-          v-for="chapter in selectedBookInfo.chapters"
-          :key="chapter"
+          v-for="chapter in selectedBookData.chapters"
+          :key="chapter.number"
           class="btn btn-ghost bg-base-200 aspect-square w-14"
-          @click="selectChapter(chapter)"
+          @click="selectChapter(chapter.number)"
         >
-          {{ chapter }}
+          {{ chapter.number }}
         </button>
       </div>
     </template>
 
     <!-- Verse selection view (only when selectVerse prop is true) -->
-    <template v-else-if="selectedBookInfo && selectedChapter">
+    <template v-else-if="selectedBookData && selectedChapter">
       <div class="pt-5 bg-base-100 sticky top-0 z-10">
         <button
           class="btn btn-ghost w-full justify-start text-lg font-bold mb-2"
           @click="goBack"
         >
           <Icon icon="chevron_left" :size="20" />
-          {{ selectedBookInfo.name }} {{ selectedChapter }}
+          {{ selectedBookData.name }} {{ selectedChapter }}
         </button>
       </div>
       <div class="flex flex-wrap gap-2">

@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import type { Verse } from '~/types/verse/Verse.type'
 
-defineProps<{
+const props = defineProps<{
   verse: Verse
   isFocused: boolean
   isFocusActive: boolean
 }>()
 
+const textLines = computed(() => {
+  return props.verse.text.split('\\n')
+})
 </script>
 
 <template>
@@ -21,7 +24,13 @@ defineProps<{
       {{ verse.number }}
     </span>
     <span class="leading-[1.9]">
-      {{ verse.text }}
+      <template
+        v-for="(line, index) in textLines"
+        :key="index"
+      >
+        {{ line }}
+        <br v-if="index < textLines.length - 1">
+      </template>
     </span>
   </p>
 </template>

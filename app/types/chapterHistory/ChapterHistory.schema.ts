@@ -1,8 +1,8 @@
 import { z } from 'zod'
-import { BookName } from '~/utils/book'
+import { BookAbbreviation } from '~/utils/book'
 
 export const chapterHistorySchema = z.object({
-  book: z.enum(BookName),
+  book: z.enum(BookAbbreviation),
   chapter: z.number(),
   verse: z.number().optional(),
   versionName: z.string(),

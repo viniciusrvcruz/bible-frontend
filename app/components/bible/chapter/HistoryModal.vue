@@ -2,6 +2,7 @@
 import type { ChapterHistory } from '~/types/chapterHistory/ChapterHistory.type'
 import { useChapterHistory } from '~/composables/bible/useChapterHistory'
 
+const versionStore = useVersionStore()
 const { goToChapter } = useNavigateToBible()
 const {
   chapterHistory,
@@ -22,13 +23,19 @@ const close = () => {
 }
 
 const navigateToChapter = (item: ChapterHistory) => {
+  const version = versionStore.getVersionByAbbreviation(item.versionName)
+
+  if (version) versionStore.setCurrentVersion(version)
+
   goToChapter(item.book, item.chapter, item.verse)
   close()
 }
 
 // Formats the chapter display text (e.g., "Genesis 1:5" or "Genesis 1")
 const formatChapter = (item: ChapterHistory) => {
-  const bookName = getBookInfo(item.book).name
+  const versionStore = useVersionStore()
+  const bookData = versionStore.getBookByAbbreviation(item.book)
+  const bookName = bookData?.name ?? ''
 
   if (!item.verse) return `${bookName} ${item.chapter}`
 

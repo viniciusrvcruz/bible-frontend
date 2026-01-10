@@ -1,5 +1,4 @@
-import type { BookInfo } from '~/types/book/Book.type'
-
+// Fallback data - usado apenas para validação de tipos
 const BOOKS = [
   ['gen', 'Gênesis', 50],
   ['exo', 'Êxodo', 40],
@@ -69,34 +68,19 @@ const BOOKS = [
   ['rev', 'Apocalipse', 22],
 ] as const
 
-export type BookNameType = typeof BOOKS[number][0]
+export type BookAbbreviationType = typeof BOOKS[number][0]
 
-export const BookName = Object.fromEntries(
+export const BookAbbreviation = Object.fromEntries(
   BOOKS.map(([key]) => [key, key])
-) as { [K in BookNameType]: K }
+) as { [K in BookAbbreviationType]: K }
 
-export const BOOKS_INFO = Object.fromEntries(
-  BOOKS.map(([key, name, chapters]) => [key, { name, chapters }])
-) as Record<BookNameType, BookInfo>
+const bookAbbreviationSet = new Set<string>(BOOKS.map(([key]) => key))
 
-const bookNameSet = new Set<string>(BOOKS.map(([key]) => key))
-
-export function isValidBookName(value: string): value is BookNameType {
-  return bookNameSet.has(value)
+export function isValidBookAbbreviation(value: string): value is BookAbbreviationType {
+  return bookAbbreviationSet.has(value)
 }
 
-export function getBookName(key: string): BookNameType | undefined {
+export function getBookAbbreviation(key: string): BookAbbreviationType | undefined {
   const lowerKey = key.toLowerCase()
-  return isValidBookName(lowerKey) ? lowerKey : undefined
-}
-
-export function getBookInfo(bookName: BookNameType): BookInfo {
-  return BOOKS_INFO[bookName]
-}
-
-export function getAllBooks(): Array<{ key: BookNameType; info: BookInfo }> {
-  return BOOKS.map(([key, name, chapters]) => ({
-    key,
-    info: { name, chapters },
-  }))
+  return isValidBookAbbreviation(lowerKey) ? lowerKey : undefined
 }
