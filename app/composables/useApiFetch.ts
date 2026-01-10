@@ -12,5 +12,6 @@ export function useApiFetch<T>(url: string) {
       'Content-Type': 'application/json',
     },
     key: url,
+    retry: 0,
   })
 }
