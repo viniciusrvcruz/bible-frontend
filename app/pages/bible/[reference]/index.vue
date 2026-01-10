@@ -34,7 +34,7 @@ if (version.id !== versionStore.currentVersion?.id) {
   versionStore.setCurrentVersionBooks(books)
 }
 
-const { data: chapterData } = await chapterService.show(book, chapter, version.id)
+const { data: chapterData } = await chapterService.useShow(book, chapter, version.id)
 
 if (!chapterData.value) {
   throw createAppError('O capítulo não foi encontrado')

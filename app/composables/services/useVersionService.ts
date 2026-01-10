@@ -1,11 +1,11 @@
 import type { Version } from '~/types/version/Version.type'
 
 export function useVersionService() {
-  const index = () => {
+  const useIndex = () => {
     return useApiFetch<Version[]>('versions')
   }
 
   return {
-    index,
+    useIndex,
   }
 }

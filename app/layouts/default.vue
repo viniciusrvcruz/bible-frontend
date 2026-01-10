@@ -6,7 +6,7 @@ const versionStore = useVersionStore()
 const versionService = useVersionService()
 const bookService = useBookService()
 
-const { data: versions } = await versionService.index()
+const { data: versions } = await versionService.useIndex()
 
 if (!versions.value) {
   throw createAppError('As versões não foram encontradas')
@@ -15,7 +15,7 @@ if (!versions.value) {
 versionStore.setVersions(versions.value)
 
 // Load books for current version
-const { data: books } = await bookService.indexFetch(versionStore.currentVersion!.id)
+const { data: books } = await bookService.useIndex(versionStore.currentVersion!.id)
 
 if (!books.value) {
   throw createAppError('Os livros não foram encontrados')

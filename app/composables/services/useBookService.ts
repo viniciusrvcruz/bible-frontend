@@ -3,7 +3,7 @@ import type { BookWithChapters } from '~/types/book/Book.type'
 export function useBookService() {
   const api = useApi()
 
-  const indexFetch = (version_id: number) => {
+  const useIndex = (version_id: number) => {
     return useApiFetch<BookWithChapters[]>(`versions/${version_id}/books`)
   }
 
@@ -12,7 +12,7 @@ export function useBookService() {
   }
 
   return {
-    indexFetch,
+    useIndex,
     index,
   }
 }
