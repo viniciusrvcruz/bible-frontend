@@ -148,7 +148,7 @@ const handleVersionSelect = async (version: Version) => {
 
         <div 
           :class="[
-            'max-w-2xl mx-auto text-justify',
+            'max-w-lg mx-auto px-2',
             fontSize,
             fontFamily
           ]"

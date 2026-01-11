@@ -6,15 +6,11 @@ const props = defineProps<{
   isFocused: boolean
   isFocusActive: boolean
 }>()
-
-const textLines = computed(() => {
-  return props.verse.text.split('\\n')
-})
 </script>
 
 <template>
   <p
-    class="px-2 py-1 block leading-[1.9] indent-0 cursor-pointer transition-all duration-200 ease-in-out mb-[0.4em]"
+    class="p-1 inline leading-[1.9] indent-0 cursor-pointer transition-all duration-200 ease-in-out whitespace-pre-line"
     :class="{
       'relative bg-base-100 rounded shadow-lg z-2': isFocused,
       'hover:bg-base-200/50 rounded': !isFocusActive
@@ -23,14 +19,6 @@ const textLines = computed(() => {
     <span class="text-[0.8em] align-super leading-0 font-bold text-base-content/50 me-2">
       {{ verse.number }}
     </span>
-    <span class="leading-[1.9]">
-      <template
-        v-for="(line, index) in textLines"
-        :key="index"
-      >
-        {{ line }}
-        <br v-if="index < textLines.length - 1">
-      </template>
-    </span>
+    <span class="leading-[1.9]">{{ verse.text }}</span>
   </p>
 </template>
