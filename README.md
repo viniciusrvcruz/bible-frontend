@@ -154,6 +154,12 @@ npm run preview
 
 ---
 
+## 📚 Documentação técnica
+
+Guias organizados em **`core/`** (base compartilhada), **`domains/`** (bible, home, help) e **`testing/`** — índice em **[`docs/README.md`](./docs/README.md)**.
+
+---
+
 ## 📁 Estrutura do Projeto
 
 ```
