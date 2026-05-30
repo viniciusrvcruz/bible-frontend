@@ -23,6 +23,7 @@ Guidance for AI coding agents and contributors working on this codebase. Follow 
 | Validation / API shapes | Zod (`zod` v4) |
 | Icons | `@nuxt/icon` — registered component name **`NuxtIcon`**; prefer semantic **`Icon`** wrapper (`app/components/Icon.vue`) |
 | SEO | `@nuxtjs/seo`, PWA (`@vite-pwa/nuxt`), analytics (`nuxt-gtag`, `nuxt-clarity-analytics`) |
+| Testing | [Vitest](https://vitest.dev/) + [`@nuxt/test-utils`](https://nuxt.com/docs/getting-started/testing) (unit, Nuxt runtime, e2e) |
 
 There is **no ESLint config** in-repo at the time of writing; rely on TypeScript and match surrounding style.
 
@@ -51,13 +52,19 @@ docker compose exec bible_frontend bash
 | `npm run build` | Production build |
 | `npm run preview` | Preview production build |
 | `npx nuxt typecheck` | TypeScript check (runs in CI) |
+| `npm test` | Run all Vitest projects (unit, nuxt, e2e) |
+| `npm run test:unit` | Pure unit tests only (Node, fast) |
+| `npm run test:nuxt` | Tests that need the Nuxt runtime (DOM, auto-imports) |
+| `npm run test:e2e` | End-to-end tests via `@nuxt/test-utils/e2e` |
+| `npm run test:watch` | Vitest watch mode |
 
 **Env in Docker:** set **`NUXT_PUBLIC_API_BASE_URL`** to a URL reachable from the browser (e.g. `http://localhost:8080`). Set **`NUXT_API_BASE_URL`** to the backend hostname on **`bible_network`** (e.g. `http://bible_api:8080`) for SSR/server-side `$api` calls.
 
-**Before opening a PR:** run typecheck and build **in the container** (mirrors CI):
+**Before opening a PR:** run typecheck, tests, and build **in the container** (mirrors CI):
 
 ```bash
 docker compose exec bible_frontend npx nuxt typecheck
+docker compose exec bible_frontend npm test
 docker compose exec bible_frontend npm run build
 ```
 
@@ -82,6 +89,12 @@ app/
   app.vue                # Root: NuxtLayout + NuxtPage
 server/
   api/                   # Nitro routes (e.g. sitemap URL source)
+test/
+  unit/                  # Pure logic (Node env) — mirrors app/ (utils/, composables/, …)
+  nuxt/                  # Nuxt runtime (happy-dom) — mirrors app/ for DOM, components, composables
+  e2e/                   # Full app via @nuxt/test-utils/e2e — SSR, Nitro routes
+vitest.config.ts         # Vitest projects (unit / nuxt / e2e)
+.env.test                # Env vars loaded during Vitest runs
 nuxt.config.ts           # Modules, runtimeConfig, SEO, PWA, PrimeVue, color-mode
 ```
 
@@ -161,6 +174,32 @@ Reader-specific logic: `useBibleReference`, `useNavigateToBible`, `useChapterHis
 
 - Use **`createAppError(message, statusCode?)`** from **`app/utils/errors.ts`** for user-facing failures (wraps Nuxt **`createError`**; **`fatal`** is tied to client).
 
+## Testing
+
+Tests use **Vitest** with three projects defined in **`vitest.config.ts`** (see [Nuxt testing docs](https://nuxt.com/docs/getting-started/testing)):
+
+| Project | Directory | Environment | Use for |
+|---------|-----------|-------------|---------|
+| `unit` | `test/unit/` | Node | Pure functions, Zod schemas, book metadata — no Nuxt auto-imports |
+| `nuxt` | `test/nuxt/` | Nuxt + happy-dom | Components, composables, DOM helpers — use `mountSuspended`, `mockNuxtImport`, `registerEndpoint` |
+| `e2e` | `test/e2e/` | Node + Nuxt server | SSR pages, Nitro routes — use `$fetch` and `setup()` from `@nuxt/test-utils/e2e` |
+
+**Conventions:**
+
+- File pattern: `*.test.ts` or `*.spec.ts` under `test/<project>/`, **mirroring `app/`** (e.g. `app/utils/bible/book.ts` → `test/unit/utils/bible/book.test.ts`).
+- **`test/nuxt/`** files get Nuxt TypeScript context (`~/`, auto-imports). **`test/unit/`** imports source via `~/` alias configured in Vitest — do not rely on Nuxt runtime features there.
+- **`@nuxt/test-utils/runtime`** and **`@nuxt/test-utils/e2e`** must not be mixed in the same file.
+- Env for tests: **`.env.test`** (committed — fake values only; loaded automatically by Vitest). CI may override with GitHub secrets when set.
+- E2e tests that hit pages with API bootstrap (e.g. **`layouts/default.vue`**) need a reachable backend or mocks. Prefer **unit tests** for Nitro route logic (see **`app/utils/bible/sitemapUrls.ts`**) — full **`@nuxt/test-utils/e2e`** `setup()` rebuilds the app and is slow (~45s+); reserve e2e for true SSR/page or browser flows.
+
+**Helpers (Nuxt runtime tests):**
+
+- **`mountSuspended`** — mount Vue components with Nuxt context (`@nuxt/test-utils/runtime`).
+- **`mockNuxtImport`** / **`mockComponent`** — mock auto-imports and components.
+- **`registerEndpoint`** — mock Nitro endpoints for component data fetching.
+
+**CI:** `.github/workflows/ci.yml` runs `npm test` after typecheck and before build.
+
 ## Environment
 
 - **`app/utils/env.ts`** parses **`import.meta.env`** with Zod (`NUXT_PUBLIC_API_BASE_URL`, `NUXT_API_KEY`, etc.).
@@ -192,7 +231,8 @@ Reader-specific logic: `useBibleReference`, `useNavigateToBible`, `useChapterHis
 
 ## What agents should do
 
-- **Run commands in Docker first**: use **`docker compose exec bible_frontend <command>`** for `npm install`, `npm run dev`, `npm run build`, `npx nuxt typecheck`, and similar tasks. Start the stack with **`docker compose up -d`** if the container is not running.
+- **Run commands in Docker first**: use **`docker compose exec bible_frontend <command>`** for `npm install`, `npm run dev`, `npm run build`, `npm test`, `npx nuxt typecheck`, and similar tasks. Start the stack with **`docker compose up -d`** if the container is not running.
+- **Add tests** mirroring **`app/`** layout under **`test/unit/`** or **`test/nuxt/`**; use **`test/e2e/`** only for full-server SSR or browser flows.
 - **Match domain boundaries**: API glue in **`composables/services/`**, reader behavior in **`composables/bible/`**, pure helpers in **`utils/`**.
 - **Add or extend Zod schemas** when API payloads or forms gain fields; infer types from schemas rather than duplicating interfaces.
 - **Use existing bootstrap flows**: do not bypass `$api` for same-origin API calls; respect server-only headers.
