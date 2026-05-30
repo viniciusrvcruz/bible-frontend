@@ -2,6 +2,10 @@
 
 Guidance for AI coding agents and contributors working on this codebase. Follow these conventions so new work stays consistent with existing patterns.
 
+## Deep-dive docs
+
+Domain-specific guides (Portuguese prose, English filenames) live under **[`docs/`](./docs/README.md)** — **`core/`** (HTTP, shell, UI, SEO) vs **`domains/`** (bible, home, help) vs **`testing/`**. Start at [`docs/domains/bible/overview.md`](./docs/domains/bible/overview.md) for reader work, or [`docs/core/`](./docs/core/) for shared app infrastructure.
+
 ## Product context
 
 - **Bibleasy** (`bibleasy-frontend` in `package.json`) is a **Nuxt 4** web app for reading the Bible online.
