@@ -5,14 +5,14 @@ const props = defineProps<{
   reference: VerseReference
 }>()
 
-const popover = useTemplateRef('popover')
+const popoverRef = useTemplateRef('popoverRef')
 
 const toggle = (event: Event) => {
-  popover.value?.toggle(event)
+  popoverRef.value?.toggle(event)
 }
 
 const close = () => {
-  popover.value?.hide()
+  popoverRef.value?.hide()
 }
 </script>
 
@@ -27,7 +27,11 @@ const close = () => {
       <Icon icon="file_text" class="w-[1em] h-[1em] transition-transform duration-200 group-hover:scale-110" />
       <span class="sr-only">Ver referência bíblica</span>
     </button>
-    <Popover ref="popover" :pt="{ content: { class: 'p-0! rounded-lg!' } }">
+    <Popover
+      ref="popoverRef"
+      class="verse-reference-popover"
+      :pt="{ content: { class: 'p-0! rounded-lg!' } }"
+    >
       <div class="min-w-xs max-w-sm">
         <div class="flex items-center justify-between bg-base-300 px-3 py-2 rounded-t-box">
           <h3 class="font-semibold text-base-content">Notas e referências</h3>

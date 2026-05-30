@@ -31,6 +31,7 @@ const onClick = (event: MouseEvent) => {
   const target = event.target as HTMLElement
 
   if (target.closest('button')) return
+  if (document.querySelector('.verse-reference-popover')) return
 
   emit('toggleSelect')
 }
