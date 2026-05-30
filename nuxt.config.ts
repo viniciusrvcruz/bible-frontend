@@ -13,6 +13,7 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
   modules: [
+    '@nuxt/test-utils/module',
     '@nuxt/icon',
     '@primevue/nuxt-module',
     '@nuxtjs/color-mode',
