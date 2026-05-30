@@ -7,7 +7,12 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run --project unit",
+    "test:nuxt": "vitest run --project nuxt",
+    "test:e2e": "vitest run --project e2e"
   },
   "dependencies": {
     "@nuxt/icon": "^2.1.1",
@@ -29,8 +34,13 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
+    "@nuxt/test-utils": "^4.0.3",
     "@primevue/nuxt-module": "^4.5.4",
+    "@vue/test-utils": "^2.4.10",
+    "happy-dom": "^20.9.0",
+    "playwright-core": "^1.60.0",
     "typescript": "^5.9.3",
+    "vitest": "^4.1.7",
     "vue-tsc": "^3.2.4"
   }
 }

@@ -1,4 +1,4 @@
-name: CI (Build and Typecheck)
+name: CI (Build, Typecheck and Test)
 
 on:
   pull_request:
@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-typecheck:
-    name: Build and Typecheck
+  build-typecheck-and-test:
+    name: Build, Typecheck and Test
     runs-on: ubuntu-latest
     env:
       NUXT_PUBLIC_API_BASE_URL: ${{ secrets.NUXT_PUBLIC_API_BASE_URL }}
@@ -27,6 +27,9 @@ jobs:
 
       - name: Typecheck
         run: npx nuxt typecheck
+
+      - name: Test
+        run: npm test
 
       - name: Build
         run: npm run build
