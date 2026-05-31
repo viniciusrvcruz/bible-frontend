@@ -4,6 +4,15 @@ import { chapterHistorySchema } from '~/types/chapterHistory/ChapterHistory.sche
 const STORAGE_KEY = 'chapter-history'
 const MAX_HISTORY_ITEMS = 30
 
+const isSameChapterHistoryEntry = (
+  a: ChapterHistory,
+  b: ChapterHistory
+): boolean =>
+  a.book === b.book &&
+  a.chapter === b.chapter &&
+  a.verse === b.verse &&
+  a.versionName === b.versionName
+
 export const useChapterHistory = () => {
   const chapterHistory = ref<ChapterHistory[]>([])
 
@@ -26,6 +35,12 @@ export const useChapterHistory = () => {
     if (!import.meta.client) return
 
     loadHistory()
+
+    const latest = chapterHistory.value[0]
+
+    if (latest && isSameChapterHistoryEntry(latest, item)) {
+      return
+    }
 
     chapterHistory.value.unshift(item)
     chapterHistory.value = chapterHistory.value.slice(0, MAX_HISTORY_ITEMS)
