@@ -10,11 +10,15 @@ const ICON_MAP = {
   book_open: 'lucide:book-open-text',
   book: 'lucide:book',
   swap_horiz: 'lucide:repeat',
+
   document: 'mdi:file-document-outline',
   clock: 'mdi:clock-outline',
   edit: 'mdi:pencil',
   help: 'mdi:help-circle-outline',
   palette: 'mdi:palette-outline',
+  broom: 'mdi:broom',
+  share: 'mdi:share',
+
   menu: 'lucide:menu',
   home: 'lucide:home',
   user: 'lucide:user',
@@ -22,13 +26,9 @@ const ICON_MAP = {
   check: 'lucide:check',
   chevron_left: 'lucide:chevron-left',
   chevron_right: 'lucide:chevron-right',
-  history: 'tabler:history',
-  letter_case: 'tabler:letter-case',
   globe: 'lucide:globe',
   search: 'lucide:search',
   close: 'lucide:x',
-  github: 'simple-icons:github',
-  linkedin: 'simple-icons:linkedin',
   keyboard: 'lucide:keyboard',
   rocket: 'lucide:rocket',
   bookmark: 'lucide:bookmark',
@@ -36,7 +36,6 @@ const ICON_MAP = {
   copy: 'lucide:copy',
   info: 'lucide:info',
   file_text: 'lucide:file-text',
-  broom: 'mdi:broom',
   fullscreen: 'lucide:maximize',
   fullscreen_exit: 'lucide:minimize',
   sparkles: 'lucide:sparkles',
@@ -50,7 +49,12 @@ const ICON_MAP = {
   bug: 'lucide:bug',
   lightbulb: 'lucide:lightbulb',
   attachment: 'lucide:paperclip',
-  share: 'mdi:share',
+
+  history: 'tabler:history',
+  letter_case: 'tabler:letter-case',
+
+  github: 'simple-icons:github',
+  linkedin: 'simple-icons:linkedin',
 } as const
 
 </script>
