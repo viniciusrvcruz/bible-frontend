@@ -83,14 +83,7 @@ export default defineNuxtConfig({
 
   icon: {
     componentName: 'NuxtIcon',
-    serverBundle: {
-      collections: [
-        'lucide',
-        'mdi',
-        'tabler',
-        'simple-icons'
-      ]
-    },
+    serverBundle: 'remote',
   },
 
   primevue: {
