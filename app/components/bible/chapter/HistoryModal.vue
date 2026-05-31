@@ -2,6 +2,7 @@
 import type { ChapterHistory } from '~/types/chapterHistory/ChapterHistory.type'
 import { useChapterHistory } from '~/composables/bible/useChapterHistory'
 import { getDefaultBookName } from '~/utils/bible/book'
+import { formatDayLabel, formatTime } from '~/utils/date'
 import { useBookService } from '~/composables/services/useBookService'
 
 const versionStore = useVersionStore()
@@ -52,6 +53,43 @@ const formatChapter = (item: ChapterHistory) => {
   return `${bookName} ${item.chapter}:${item.verse}`
 }
 
+const groupedHistory = computed(() => {
+  const getDayKey = (timestamp: number) => {
+    const date = new Date(timestamp)
+    return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
+  }
+
+  const groups: {
+    dayKey: string
+    label: string
+    items: ChapterHistory[]
+  }[] = []
+
+  let currentDayKey: string | null = null
+  let currentGroup: (typeof groups)[number] | null = null
+
+  for (const item of chapterHistory.value) {
+    const dayKey = getDayKey(item.timestamp)
+
+    if (dayKey !== currentDayKey) {
+      currentGroup = {
+        dayKey,
+        label: formatDayLabel(item.timestamp),
+        items: []
+      }
+      groups.push(currentGroup)
+      currentDayKey = dayKey
+    }
+
+    currentGroup!.items.push(item)
+  }
+
+  return groups
+})
+
+const historyItemKey = (item: ChapterHistory) =>
+  `${item.book}-${item.chapter}-${item.verse ?? '-'}-${item.versionName}-${item.timestamp}`
+
 defineExpose({
   addToHistory,
   open
@@ -93,25 +131,35 @@ defineExpose({
       </div>
       
       <!-- History list -->
-      <div v-else class="space-y-2 overflow-y-auto flex-1 sm:max-h-96">
-        <button
-          v-for="(item, index) in chapterHistory"
-          :key="index"
-          class="w-full text-left p-3 rounded-lg transition-colors flex items-center gap-3 border border-base-300 cursor-pointer hover:bg-base-200"
-          @click="navigateToChapter(item)"
+      <div v-else class="space-y-4 overflow-y-auto flex-1 sm:max-h-96">
+        <section
+          v-for="group in groupedHistory"
+          :key="group.dayKey"
         >
-          <div class="flex-1">
-            <div class="font-semibold">
-              {{ formatChapter(item) }}
-            </div>
-            <div class="text-xs text-base-content/60 mt-1 flex items-center gap-2">
-              <span>{{ item.versionName }}</span>
-              <span>•</span>
-              <span>{{ new Date(item.timestamp).toLocaleString('pt-BR') }}</span>
-            </div>
+          <h4 class="text-lg font-semibold text-base-content/70 mb-1">
+            {{ group.label }}
+          </h4>
+          <div class="space-y-2">
+            <button
+              v-for="item in group.items"
+              :key="historyItemKey(item)"
+              class="w-full text-left p-3 rounded-lg transition-colors flex items-center gap-3 border border-base-300 cursor-pointer hover:bg-base-200"
+              @click="navigateToChapter(item)"
+            >
+              <div class="flex-1">
+                <div class="font-semibold">
+                  {{ formatChapter(item) }}
+                </div>
+                <div class="text-xs text-base-content/60 mt-1 flex items-center gap-2">
+                  <span class="break-all">{{ versionStore.getVersionByAbbreviation(item.versionName)?.name ?? item.versionName }}</span>
+                  <span>•</span>
+                  <span>{{ formatTime(item.timestamp) }}</span>
+                </div>
+              </div>
+              <Icon icon="chevron_right" :size="20" class="text-base-content/40 self-center" />
+            </button>
           </div>
-          <Icon icon="chevron_right" :size="20" class="text-base-content/40 self-center" />
-        </button>
+        </section>
       </div>
       
       <!-- Clear action -->
