@@ -11,7 +11,10 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
 
-  css: ['~/assets/css/main.css'],
+  css: [
+    '~/assets/css/main.css',
+    '~/assets/css/custom-themes.css',
+  ],
   modules: [
     '@nuxt/test-utils/module',
     '@nuxt/icon',
