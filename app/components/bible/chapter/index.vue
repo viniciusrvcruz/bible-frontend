@@ -5,6 +5,7 @@ import type { Version } from '~/types/version/Version.type'
 import { VerseTitlePositionEnum } from '~/types/verseTitle/verseTitle.schema'
 import { useVerseFocus } from '~/composables/bible/useVerseFocus'
 import { useSelectedVerses } from '~/composables/bible/useSelectedVerses'
+import { provideSelectedVersesContext } from '~/composables/bible/useSelectedVersesContext'
 import { useVerseHighlights } from '~/composables/bible/useVerseHighlights'
 import { useChapterHistory } from '~/composables/bible/useChapterHistory'
 import { useBookService } from '~/composables/services/useBookService'
@@ -191,6 +192,14 @@ const handleVersionSelect = (version: Version) => {
     )
   })
 }
+
+provideSelectedVersesContext({
+  selectedVerses,
+  displayedVerseNumbers: computed(() => selectedVerses.value.slice(0, 10)),
+  bookAbbreviation: computed(() => props.chapter.book.abbreviation),
+  chapterNumber: computed(() => props.chapter.number),
+  bookName: computed(() => props.chapter.book.name),
+})
 
 </script>
 

@@ -10,13 +10,20 @@ export function chapterResourcePath(
 }
 
 export function useChapterService() {
+  const api = useApi()
+
   const useShow = (book: BookAbbreviationType, chapter: number, version_id: number) => {
     return useApiFetch<Chapter>(
       chapterResourcePath(book, chapter, version_id)
     )
   }
 
+  const show = (book: BookAbbreviationType, chapter: number, version_id: number) => {
+    return api.get<Chapter>(chapterResourcePath(book, chapter, version_id))
+  }
+
   return {
     useShow,
+    show,
   }
 }
