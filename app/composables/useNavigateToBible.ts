@@ -1,4 +1,5 @@
 import { BookAbbreviation } from '~/utils/bible/book'
+import { buildChapterUrl } from '~/utils/bible/chapterUrl'
 
 export const useNavigateToBible = () => {
   const versionStore = useVersionStore()
@@ -19,21 +20,12 @@ export const useNavigateToBible = () => {
     chapter: number,
     versionAbbreviation?: string,
     verse?: number,
-  ) => {
-    const version =
-      versionAbbreviation ??
-      versionStore.currentVersion?.abbreviation ??
-      ''
-    const versionSuffix = version ? `.${version}` : ''
-
-    const path = `/bible/${book}.${chapter}${versionSuffix}`
-    const hash =
-      verse !== undefined && verse > 1
-        ? `#v${verse}`
-        : ''
-
-    return `${path}${hash}`
-  }
+  ) =>
+    buildChapterUrl(book, chapter, {
+      versionAbbreviation,
+      defaultVersionAbbreviation: versionStore.currentVersion?.abbreviation,
+      verse,
+    })
 
   const goToChapter = async (
     book: string,
@@ -42,6 +34,19 @@ export const useNavigateToBible = () => {
     replace: boolean = false,
   ) => {
     await navigateTo(getChapterUrl(book, chapter, undefined, verse), { replace })
+  }
+
+  const goToChapterInVersion = async (
+    book: string,
+    chapter: number,
+    versionAbbreviation: string,
+    verse?: number,
+    replace: boolean = false,
+  ) => {
+    await navigateTo(
+      getChapterUrl(book, chapter, versionAbbreviation, verse),
+      { replace },
+    )
   }
 
   const goToLastChapter = async (replace: boolean = false) => {
@@ -63,6 +68,7 @@ export const useNavigateToBible = () => {
     lastChapterUrl,
     getChapterUrl,
     goToChapter,
+    goToChapterInVersion,
     goToLastChapter,
   }
 }
