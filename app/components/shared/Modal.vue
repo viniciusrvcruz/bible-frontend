@@ -4,11 +4,10 @@ const props = withDefaults(defineProps<{
   titleId?: string
   closeAriaLabel?: string
   padded?: boolean
-  closeOnBackdrop?: boolean
   headerBordered?: boolean
+  boxClass?: string
 }>(), {
   padded: true,
-  closeOnBackdrop: true,
   closeAriaLabel: 'Fechar',
   headerBordered: false,
 })
@@ -27,6 +26,7 @@ const boxClasses = computed(() => [
   {
     'p-0': !props.padded,
   },
+  props.boxClass,
 ])
 
 const showHeader = computed(() => Boolean(props.title || slots.header))
@@ -37,12 +37,6 @@ const open = () => {
 
 const close = () => {
   dialogRef.value?.close()
-}
-
-const handleBackdropClick = () => {
-  if (!props.closeOnBackdrop) return
-
-  close()
 }
 
 const handleDialogClose = () => {
@@ -60,7 +54,6 @@ defineExpose({
     ref="dialogRef"
     class="modal modal-bottom sm:modal-middle"
     :aria-labelledby="showHeader ? resolvedTitleId : undefined"
-    @click.self="handleBackdropClick"
     @close="handleDialogClose"
   >
     <div :class="boxClasses">
@@ -91,5 +84,9 @@ defineExpose({
         <slot name="footer" />
       </footer>
     </div>
+
+    <form method="dialog" class="modal-backdrop">
+      <button aria-label="Fechar">close</button>
+    </form>
   </dialog>
 </template>

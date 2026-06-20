@@ -75,22 +75,13 @@ describe('SharedModal', () => {
   })
 
   describe('backdrop behavior', () => {
-    it('closes on backdrop click when closeOnBackdrop is enabled', async () => {
-      const { close } = setupDialogSpies()
-      const { dialog } = await mountModal({ closeOnBackdrop: true })
+    it('uses a native dialog form for backdrop dismissal', async () => {
+      const { dialog } = await mountModal()
+      const form = dialog.find('form.modal-backdrop')
 
-      await dialog.trigger('click')
-
-      expect(close).toHaveBeenCalledOnce()
-    })
-
-    it('does not close on backdrop click when closeOnBackdrop is disabled', async () => {
-      const { close } = setupDialogSpies()
-      const { dialog } = await mountModal({ closeOnBackdrop: false })
-
-      await dialog.trigger('click')
-
-      expect(close).not.toHaveBeenCalled()
+      expect(form.exists()).toBe(true)
+      expect(form.attributes('method')).toBe('dialog')
+      expect(form.find('button[aria-label="Fechar"]').exists()).toBe(true)
     })
 
     it('does not close when clicking modal content', async () => {
@@ -229,6 +220,18 @@ describe('SharedModal', () => {
       const { dialog } = await mountModal({ padded: true })
 
       expect(dialog.find('.modal-box').classes()).not.toContain('p-0')
+    })
+
+    it('applies custom box classes', async () => {
+      const { dialog } = await mountModal({ boxClass: 'custom-box-class' })
+
+      expect(dialog.find('.modal-box').classes()).toContain('custom-box-class')
+    })
+
+    it('forwards id attribute to the dialog element', async () => {
+      const { dialog } = await mountModal({ id: 'custom-modal-id' })
+
+      expect(dialog.attributes('id')).toBe('custom-modal-id')
     })
   })
 
