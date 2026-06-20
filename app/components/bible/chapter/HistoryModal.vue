@@ -15,15 +15,11 @@ const {
   loadHistory
 } = useChapterHistory()
 
-const dialogRef = useTemplateRef<HTMLDialogElement>('dialogRef')
+const modalRef = useModalRef('modalRef')
 
 const open = () => {
   loadHistory()
-  dialogRef.value?.showModal()
-}
-
-const close = () => {
-  dialogRef.value?.close()
+  modalRef.value?.open()
 }
 
 const navigateToChapter = async (item: ChapterHistory) => {
@@ -39,7 +35,7 @@ const navigateToChapter = async (item: ChapterHistory) => {
   }
 
   goToChapter(item.book, item.chapter, item.verse)
-  close()
+  modalRef.value?.close()
 }
 
 // Formats the chapter display text (e.g., "Genesis 1:5" or "Genesis 1")
@@ -97,80 +93,64 @@ defineExpose({
 </script>
 
 <template>
-  <dialog
-    ref="dialogRef"
-    class="modal modal-bottom sm:modal-middle"
-    aria-labelledby="history-modal-title"
-    @click.self="close"
+  <SharedModal
+    ref="modalRef"
+    title="Histórico de Leitura"
+    title-id="history-modal-title"
+    close-aria-label="Fechar modal de histórico"
   >
-    <div class="modal-box max-w-2xl sm:rounded-lg max-sm:max-w-full max-sm:w-full max-sm:h-[calc(100dvh-4rem)] max-sm:mb-0 max-sm:mt-16 max-sm:rounded-b-none max-sm:flex max-sm:flex-col">
-      <!-- Header with close button -->
-      <div class="flex items-center justify-between mb-4 shrink-0">
-        <h3 id="history-modal-title" class="font-bold text-lg">
-          Histórico de Leitura
-        </h3>
-        <button 
-          class="btn btn-sm btn-ghost btn-circle"
-          aria-label="Fechar modal de histórico"
-          @click="close"
-        >
-          <Icon icon="close" :size="20" />
-          <span class="sr-only">Fechar</span>
-        </button>
-      </div>
-      
-      <!-- Empty state -->
-      <div v-if="chapterHistory.length === 0" class="text-center py-8 text-base-content/60">
-        <Icon icon="history" :size="48" class="mx-auto mb-2 opacity-50" />
-        <p>
-          Nenhuma leitura no histórico ainda.
-        </p>
-        <p class="text-sm mt-1">
-          Navegue pelos capítulos para adicionar ao histórico.
-        </p>
-      </div>
-      
-      <!-- History list -->
-      <div v-else class="space-y-4 overflow-y-auto flex-1 sm:max-h-96">
-        <section
-          v-for="group in groupedHistory"
-          :key="group.dayKey"
-        >
-          <h4 class="text-lg font-semibold text-base-content/70 mb-1">
-            {{ group.label }}
-          </h4>
-          <div class="space-y-2">
-            <button
-              v-for="item in group.items"
-              :key="historyItemKey(item)"
-              class="w-full text-left p-3 rounded-lg transition-colors flex items-center gap-3 border border-base-300 cursor-pointer hover:bg-base-200"
-              @click="navigateToChapter(item)"
-            >
-              <div class="flex-1">
-                <div class="font-semibold">
-                  {{ formatChapter(item) }}
-                </div>
-                <div class="text-xs text-base-content/60 mt-1 flex items-center gap-2">
-                  <span class="break-all">{{ versionStore.getVersionByAbbreviation(item.versionName)?.name ?? item.versionName }}</span>
-                  <span>•</span>
-                  <span>{{ formatTime(item.timestamp) }}</span>
-                </div>
+    <!-- Empty state -->
+    <div v-if="chapterHistory.length === 0" class="text-center py-8 text-base-content/60">
+      <Icon icon="history" :size="48" class="mx-auto mb-2 opacity-50" />
+      <p>
+        Nenhuma leitura no histórico ainda.
+      </p>
+      <p class="text-sm mt-1">
+        Navegue pelos capítulos para adicionar ao histórico.
+      </p>
+    </div>
+
+    <!-- History list -->
+    <div v-else class="space-y-4 overflow-y-auto flex-1 sm:max-h-96">
+      <section
+        v-for="group in groupedHistory"
+        :key="group.dayKey"
+      >
+        <h4 class="text-lg font-semibold text-base-content/70 mb-1">
+          {{ group.label }}
+        </h4>
+        <div class="space-y-2">
+          <button
+            v-for="item in group.items"
+            :key="historyItemKey(item)"
+            class="w-full text-left p-3 rounded-lg transition-colors flex items-center gap-3 border border-base-300 cursor-pointer hover:bg-base-200"
+            @click="navigateToChapter(item)"
+          >
+            <div class="flex-1">
+              <div class="font-semibold">
+                {{ formatChapter(item) }}
               </div>
-              <Icon icon="chevron_right" :size="20" class="text-base-content/40 self-center" />
-            </button>
-          </div>
-        </section>
-      </div>
-      
-      <!-- Clear action -->
-      <div v-if="chapterHistory.length > 0" class="mt-4 pt-4 border-t border-base-300 shrink-0">
-        <button 
+              <div class="text-xs text-base-content/60 mt-1 flex items-center gap-2">
+                <span class="break-all">{{ versionStore.getVersionByAbbreviation(item.versionName)?.name ?? item.versionName }}</span>
+                <span>•</span>
+                <span>{{ formatTime(item.timestamp) }}</span>
+              </div>
+            </div>
+            <Icon icon="chevron_right" :size="20" class="text-base-content/40 self-center" />
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <template #footer>
+      <div v-if="chapterHistory.length > 0" class="mt-4 pt-4 border-t border-base-300">
+        <button
           class="btn btn-ghost btn-sm w-full"
           @click="clearHistory"
         >
           Limpar Histórico
         </button>
       </div>
-    </div>
-  </dialog>
+    </template>
+  </SharedModal>
 </template>
