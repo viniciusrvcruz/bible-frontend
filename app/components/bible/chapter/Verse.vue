@@ -75,6 +75,7 @@ const onClick = (event: MouseEvent) => {
         <BibleChapterVerseReference
           v-else-if="part.type === 'reference'"
           :reference="part.reference"
+          :verse-number="verse.number"
         />
       </template>
     </div>
