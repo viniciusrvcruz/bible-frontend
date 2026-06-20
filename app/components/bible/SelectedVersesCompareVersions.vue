@@ -127,11 +127,11 @@ watch(visibleVersions, loadVisibleVersions, { immediate: true })
     <div class="flex items-center justify-between gap-3 shrink-0 pb-4 border-b border-base-300">
       <button
         type="button"
-        class="btn btn-ghost btn-sm gap-1 -ms-2 font-semibold text-base"
+        class="btn btn-ghost btn-sm gap-2 font-semibold text-base px-4"
         aria-label="Voltar"
         @click="emit('back')"
       >
-        <Icon icon="chevron_left" :size="20" />
+        <Icon icon="chevron_left" :size="20" class="-ms-2" />
         <span id="compare-versions-modal-title">Comparar versões</span>
       </button>
 
