@@ -4,9 +4,7 @@ type SupportModalController = {
 
 type MaybeRef<T> = { value: T } | null | undefined
 
-type SupportModalExposed = {
-  open: () => void
-}
+type SupportModalExposed = Pick<SharedModalExposed, 'open'>
 
 export const useSupportModal = () => {
   const controller = useState<SupportModalController | null>(

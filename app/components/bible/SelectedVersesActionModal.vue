@@ -1,20 +1,16 @@
 <script setup lang="ts">
-const dialogRef = useTemplateRef<HTMLDialogElement>('dialogRef')
+const modalRef = useModalRef('modalRef')
 
 const emit = defineEmits<{
   close: []
 }>()
 
 const open = () => {
-  dialogRef.value?.showModal()
+  modalRef.value?.open()
 }
 
 const close = () => {
-  dialogRef.value?.close()
-}
-
-const handleClose = () => {
-  close()
+  modalRef.value?.close()
 }
 
 defineExpose({
@@ -24,15 +20,13 @@ defineExpose({
 </script>
 
 <template>
-  <dialog
-    ref="dialogRef"
+  <SharedModal
+    ref="modalRef"
     id="selected-verses-action-modal"
-    class="modal modal-bottom sm:modal-middle"
-    @click.self="handleClose"
+    :padded="false"
+    box-class="w-full max-h-[calc(100dvh-4rem)] flex flex-col"
     @close="emit('close')"
   >
-    <div class="modal-box max-w-2xl w-full max-h-[calc(100dvh-4rem)] flex flex-col p-0 sm:rounded-lg max-sm:max-w-full max-sm:mb-0 max-sm:mt-16 max-sm:rounded-b-none">
-      <slot />
-    </div>
-  </dialog>
+    <slot />
+  </SharedModal>
 </template>

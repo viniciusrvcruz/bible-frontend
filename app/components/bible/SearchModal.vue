@@ -7,7 +7,7 @@ import { useNavigateToBible } from '~/composables/useNavigateToBible'
 const { goToChapter } = useNavigateToBible()
 const versionStore = useVersionStore()
 
-const dialogRef = useTemplateRef<HTMLDialogElement>('dialogRef')
+const modalRef = useModalRef('modalRef')
 const bookInputRef = useTemplateRef<HTMLInputElement>('bookInputRef')
 const chapterInputRef = useTemplateRef<HTMLInputElement>('chapterInputRef')
 const verseInputRef = useTemplateRef<HTMLInputElement>('verseInputRef')
@@ -74,7 +74,7 @@ watch(filteredBooks, (books) => {
   clearBookSelection()
   selectedChapter.value = null
 
-  dialogRef.value?.showModal()
+  modalRef.value?.open()
 
   // Focuses on the book field after opening
   nextTick(() => bookInputRef.value?.focus())
@@ -84,7 +84,7 @@ watch(filteredBooks, (books) => {
  * Closes the modal
  */
 const close = () => {
-  dialogRef.value?.close()
+  modalRef.value?.close()
 }
 
 /**
@@ -314,109 +314,93 @@ defineExpose({
 </script>
 
 <template>
-  <dialog
-    ref="dialogRef"
-    class="modal modal-bottom sm:modal-middle"
-    aria-labelledby="search-modal-title"
-    @click.self="close"
+  <SharedModal
+    ref="modalRef"
+    title="Pesquisar Referência Bíblica"
+    title-id="search-modal-title"
+    close-aria-label="Fechar modal de pesquisa"
   >
-    <div class="modal-box max-w-2xl sm:rounded-lg max-sm:max-w-full max-sm:h-[calc(100vh-4rem)] max-sm:mb-0 max-sm:mt-16 max-sm:rounded-b-none">
-      <!-- Header -->
-      <div class="flex items-center justify-between mb-4">
-        <h3 id="search-modal-title" class="font-bold text-lg">
-          Pesquisar Referência Bíblica
-        </h3>
-        <button
-          class="btn btn-sm btn-ghost btn-circle"
-          aria-label="Fechar modal de pesquisa"
-          @click="close"
-        >
-          <Icon icon="close" :size="20" />
-          <span class="sr-only">Fechar</span>
-        </button>
-      </div>
-
-      <!-- Search fields -->
-      <div class="space-y-4">
-        <!-- Book field -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text font-semibold">Livro</span>
-          </label>
-          <div class="relative">
-            <input
-              ref="bookInputRef"
-              v-model="bookSearch"
-              type="text"
-              placeholder="Digite o nome do livro..."
-              class="input input-bordered w-full"
-              @input="handleBookInput"
-              @keydown.enter.prevent="handleBookKeydown"
-              @keydown.tab.prevent="handleBookKeydown"
-            />
-            <!-- Suggestions list -->
-            <div
-              v-if="bookSearch && filteredBooks.length > 0 && !selectedBook"
-              class="absolute z-10 w-full mt-1 bg-base-100 border border-base-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+    <!-- Search fields -->
+    <div class="space-y-4">
+      <!-- Book field -->
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-semibold">Livro</span>
+        </label>
+        <div class="relative">
+          <input
+            ref="bookInputRef"
+            v-model="bookSearch"
+            type="text"
+            placeholder="Digite o nome do livro..."
+            class="input input-bordered w-full"
+            @input="handleBookInput"
+            @keydown.enter.prevent="handleBookKeydown"
+            @keydown.tab.prevent="handleBookKeydown"
+          />
+          <!-- Suggestions list -->
+          <div
+            v-if="bookSearch && filteredBooks.length > 0 && !selectedBook"
+            class="absolute z-10 w-full mt-1 bg-base-100 border border-base-300 rounded-lg shadow-lg max-h-60 overflow-y-auto"
+          >
+            <button
+              v-for="book in filteredBooks"
+              :key="book.abbreviation"
+              class="w-full text-left px-4 py-2 hover:bg-base-200 transition-colors"
+              @click="selectBook(book)"
             >
-              <button
-                v-for="book in filteredBooks"
-                :key="book.abbreviation"
-                class="w-full text-left px-4 py-2 hover:bg-base-200 transition-colors"
-                @click="selectBook(book)"
-              >
-                {{ book.name }}
-              </button>
-            </div>
+              {{ book.name }}
+            </button>
           </div>
         </div>
-
-        <!-- Chapter field -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text font-semibold">Capítulo</span>
-            <span v-if="selectedBookData" class="label-text-alt text-base-content/60">
-              (máx: {{ selectedBookData.chapters.length }})
-            </span>
-          </label>
-          <input
-            ref="chapterInputRef"
-            type="number"
-            class="input input-bordered w-full"
-            :value="chapterSearch"
-            :min="1"
-            :max="selectedBookData?.chapters.length"
-            :placeholder="selectedBookData ? `Digite o capítulo (1-${selectedBookData.chapters.length})...` : 'Selecione um livro primeiro'"
-            :disabled="!selectedBook"
-            @input="handleChapterInput"
-            @keydown="handleChapterKeydown"
-          />
-        </div>
-
-        <!-- Verse field -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text font-semibold">Versículo (opcional)</span>
-            <span v-if="selectedChapterVerses > 0" class="label-text-alt text-base-content/60">
-              (máx: {{ selectedChapterVerses }})
-            </span>
-          </label>
-          <input
-            ref="verseInputRef"
-            type="number"
-            class="input input-bordered w-full"
-            :value="verseSearch"
-            :min="1"
-            :max="selectedChapterVerses || 176"
-            :placeholder="selectedChapter ? `Digite o versículo (1-${selectedChapterVerses || 176})...` : 'Selecione um capítulo primeiro'"
-            :disabled="!selectedChapter"
-            @input="handleVerseInput"
-            @keydown="handleVerseKeydown"
-          />
-        </div>
       </div>
 
-      <!-- Actions -->
+      <!-- Chapter field -->
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-semibold">Capítulo</span>
+          <span v-if="selectedBookData" class="label-text-alt text-base-content/60">
+            (máx: {{ selectedBookData.chapters.length }})
+          </span>
+        </label>
+        <input
+          ref="chapterInputRef"
+          type="number"
+          class="input input-bordered w-full"
+          :value="chapterSearch"
+          :min="1"
+          :max="selectedBookData?.chapters.length"
+          :placeholder="selectedBookData ? `Digite o capítulo (1-${selectedBookData.chapters.length})...` : 'Selecione um livro primeiro'"
+          :disabled="!selectedBook"
+          @input="handleChapterInput"
+          @keydown="handleChapterKeydown"
+        />
+      </div>
+
+      <!-- Verse field -->
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-semibold">Versículo (opcional)</span>
+          <span v-if="selectedChapterVerses > 0" class="label-text-alt text-base-content/60">
+            (máx: {{ selectedChapterVerses }})
+          </span>
+        </label>
+        <input
+          ref="verseInputRef"
+          type="number"
+          class="input input-bordered w-full"
+          :value="verseSearch"
+          :min="1"
+          :max="selectedChapterVerses || 176"
+          :placeholder="selectedChapter ? `Digite o versículo (1-${selectedChapterVerses || 176})...` : 'Selecione um capítulo primeiro'"
+          :disabled="!selectedChapter"
+          @input="handleVerseInput"
+          @keydown="handleVerseKeydown"
+        />
+      </div>
+    </div>
+
+    <template #footer>
       <div class="modal-action">
         <button
           class="btn btn-ghost"
@@ -432,6 +416,6 @@ defineExpose({
           Navegar
         </button>
       </div>
-    </div>
-  </dialog>
+    </template>
+  </SharedModal>
 </template>
