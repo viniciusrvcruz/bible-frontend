@@ -6,6 +6,7 @@ import { VerseTitlePositionEnum } from '~/types/verseTitle/verseTitle.schema'
 import { useVerseFocus } from '~/composables/bible/useVerseFocus'
 import { useSelectedVerses } from '~/composables/bible/useSelectedVerses'
 import { provideSelectedVersesContext } from '~/composables/bible/useSelectedVersesContext'
+import { provideVerseFocusContext } from '~/composables/bible/useVerseFocusContext'
 import { useVerseHighlights } from '~/composables/bible/useVerseHighlights'
 import { useChapterHistory } from '~/composables/bible/useChapterHistory'
 import { useBookService } from '~/composables/services/useBookService'
@@ -115,6 +116,7 @@ const {
   overlayHeight,
   handleScroll,
   handleVerseFocus,
+  focusVerseByNumber,
   clearFocus
 } = useVerseFocus(chapterContainerRef, verseNumber, clearHash)
 
@@ -198,6 +200,11 @@ provideSelectedVersesContext({
   bookAbbreviation: computed(() => props.chapter.book.abbreviation),
   chapterNumber: computed(() => props.chapter.number),
   bookName: computed(() => props.chapter.book.name),
+})
+
+provideVerseFocusContext({
+  focusVerseByNumber,
+  clearFocus,
 })
 
 </script>
