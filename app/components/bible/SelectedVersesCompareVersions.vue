@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { formatVerseReference } from '~/composables/bible/useSelectedVerses'
+import { useNavigateToBible } from '~/composables/useNavigateToBible'
 import { useSelectedVersesContext } from '~/composables/bible/useSelectedVersesContext'
 import { useCompareChapterVersions } from '~/composables/bible/useCompareChapterVersions'
 
@@ -18,7 +19,6 @@ const popoverRef = useTemplateRef('popoverRef')
 
 const {
   selectedVerses,
-  displayedVerseNumbers,
   bookName,
   chapterNumber,
   bookAbbreviation,
@@ -33,7 +33,13 @@ const {
   () => chapterNumber.value,
 )
 
+const { goToChapterInVersion } = useNavigateToBible()
+
 const MAX_COMPARE_VERSES = 10
+
+const displayedVerseNumbers = computed(() =>
+  selectedVerses.value.slice(0, MAX_COMPARE_VERSES),
+)
 
 const exceedsVerseLimit = computed(() => selectedVerses.value.length > MAX_COMPARE_VERSES)
 
@@ -72,6 +78,17 @@ const referenceLabel = computed(() => {
 
   return `${bookName.value} ${chapterNumber.value}:${formatVerseReference(numbers)}`
 })
+
+const readInThisVersion = (versionAbbreviation: string) => {
+  const firstDisplayedVerseNumber = displayedVerseNumbers.value[0]
+
+  goToChapterInVersion(
+    bookAbbreviation.value,
+    chapterNumber.value,
+    versionAbbreviation,
+    firstDisplayedVerseNumber
+  )
+}
 
 const isVersionSelected = (versionId: number) =>
   selectedVersionIds.value.includes(versionId)
@@ -245,9 +262,22 @@ watch(visibleVersions, loadVisibleVersions, { immediate: true })
             </template>
           </div>
 
-          <p class="font-bold text-base-content mt-4">
-            {{ referenceLabel }}
-          </p>
+          <div
+            class="mt-4 flex flex-wrap items-center justify-between gap-3"
+          >
+            <p class="font-bold text-base-content">
+              {{ referenceLabel }}
+            </p>
+
+            <button
+              v-if="!isCurrentVersion(version.id)"
+              type="button"
+              class="btn btn-sm"
+              @click="readInThisVersion(version.abbreviation)"
+            >
+              Ler nesta versão
+            </button>
+          </div>
         </template>
       </article>
     </div>

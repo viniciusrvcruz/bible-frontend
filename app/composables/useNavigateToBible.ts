@@ -44,6 +44,19 @@ export const useNavigateToBible = () => {
     await navigateTo(getChapterUrl(book, chapter, undefined, verse), { replace })
   }
 
+  const goToChapterInVersion = async (
+    book: string,
+    chapter: number,
+    versionAbbreviation: string,
+    verse?: number,
+    replace: boolean = false,
+  ) => {
+    await navigateTo(
+      getChapterUrl(book, chapter, versionAbbreviation, verse),
+      { replace },
+    )
+  }
+
   const goToLastChapter = async (replace: boolean = false) => {
     const lastChapter = lastChapterStore.parsedReference
 
@@ -63,6 +76,7 @@ export const useNavigateToBible = () => {
     lastChapterUrl,
     getChapterUrl,
     goToChapter,
+    goToChapterInVersion,
     goToLastChapter,
   }
 }

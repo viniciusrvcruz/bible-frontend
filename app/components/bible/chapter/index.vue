@@ -195,7 +195,6 @@ const handleVersionSelect = (version: Version) => {
 
 provideSelectedVersesContext({
   selectedVerses,
-  displayedVerseNumbers: computed(() => selectedVerses.value.slice(0, 10)),
   bookAbbreviation: computed(() => props.chapter.book.abbreviation),
   chapterNumber: computed(() => props.chapter.number),
   bookName: computed(() => props.chapter.book.name),

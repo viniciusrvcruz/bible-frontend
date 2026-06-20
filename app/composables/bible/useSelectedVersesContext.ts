@@ -2,7 +2,6 @@ import type { BookAbbreviationType } from '~/utils/bible/book'
 
 export interface SelectedVersesContext {
   selectedVerses: Ref<number[]>
-  displayedVerseNumbers: ComputedRef<number[]>
   bookAbbreviation: ComputedRef<BookAbbreviationType>
   chapterNumber: ComputedRef<number>
   bookName: ComputedRef<string>
