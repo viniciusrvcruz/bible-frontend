@@ -49,6 +49,7 @@ const ICON_MAP = {
   bug: 'lucide:bug',
   lightbulb: 'lucide:lightbulb',
   attachment: 'lucide:paperclip',
+  list_filter: 'lucide:list-filter',
 
   history: 'tabler:history',
   letter_case: 'tabler:letter-case',

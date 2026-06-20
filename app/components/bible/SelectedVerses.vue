@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { useMediaQuery } from '@vueuse/core'
 import { isValidHexColor } from '~/utils/color'
 import { useFullscreen } from '~/composables/bible/useBibleFullscreen'
+import type { SelectedVerseAction } from '~/types/bible/selectedVerseAction.type'
+import SelectedVersesCompareVersions from '~/components/bible/SelectedVersesCompareVersions.vue'
 
 const props = defineProps<{
   referenceLabel: string
@@ -15,7 +18,22 @@ const emit = defineEmits<{
 }>()
 
 const copySuccess = ref(false)
+const activeView = shallowRef<Component | null>(null)
+const actionModalRef = useTemplateRef('actionModalRef')
 const { isFullscreen } = useFullscreen()
+const isLargeScreen = useMediaQuery('(min-width: 1024px)')
+const preserveActiveViewOnModalCloseDueToResize = ref(false)
+
+const showActionInPanel = computed(() => Boolean(activeView.value && isLargeScreen.value))
+const showSelectionContent = computed(() => !activeView.value || !isLargeScreen.value)
+
+const panelClasses = computed(() => [
+  'selected-verses-panel flex flex-col bg-base-100 border-t-2 border-base-300 shrink-0 fixed bottom-0 left-0 right-0 z-10 lg:border-t-0 lg:border-s-2 lg:w-4/12 lg:sticky lg:bottom-auto p-4 lg:p-5',
+  showActionInPanel.value
+    ? 'overflow-hidden'
+    : 'overflow-y-auto overflow-x-hidden max-h-[50dvh] lg:max-h-none',
+  !isFullscreen.value && 'lg:top-header lg:h-screen-header',
+])
 
 const handleCopy = async () => {
   copySuccess.value = false
@@ -28,6 +46,54 @@ const handleCopy = async () => {
     setTimeout(() => { copySuccess.value = false }, 2000)
   }
 }
+
+const actionButtons: SelectedVerseAction[] = [
+  {
+    label: 'Copiar',
+    icon: 'copy',
+    action: handleCopy,
+  },
+  {
+    label: 'Comparar versões',
+    icon: 'compare',
+    component: SelectedVersesCompareVersions,
+  },
+]
+
+const handleCloseView = () => {
+  activeView.value = null
+  actionModalRef.value?.close()
+}
+
+const handleModalClose = () => {
+  if (preserveActiveViewOnModalCloseDueToResize.value) {
+    preserveActiveViewOnModalCloseDueToResize.value = false
+    return
+  }
+
+  // The dialog is already closing; avoid closing it again here.
+  activeView.value = null
+}
+
+const handleOpenView = (component: Component) => {
+  activeView.value = component
+
+  if (!isLargeScreen.value) {
+    nextTick(() => actionModalRef.value?.open())
+  }
+}
+
+watch(isLargeScreen, (large) => {
+  if (!activeView.value) return
+
+  if (large) {
+    // Avoid clearing `activeView` when switching from modal -> inline panel.
+    preserveActiveViewOnModalCloseDueToResize.value = true
+    return actionModalRef.value?.close()
+  }
+
+  nextTick(() => actionModalRef.value?.open())
+})
 
 const MARKER_COLORS = [
   '#AFFF90',
@@ -66,89 +132,95 @@ const handleColorClick = (color: string) => {
 </script>
 
 <template>
-  <div
-    class="selected-verses-panel flex flex-col overflow-y-auto overflow-x-hidden bg-base-100 border-t-2 border-base-300 shrink-0 fixed bottom-0 left-0 right-0 z-10 max-h-[50dvh] lg:border-t-0 lg:border-s-2 lg:w-4/12 lg:sticky lg:bottom-auto lg:max-h-none p-4 lg:p-5"
-    :class="{'lg:top-header lg:h-screen-header': !isFullscreen}"
-  >
-    <!-- Header -->
-    <div class="stagger-item stagger-1 flex justify-between items-center mb-2">
-      <span class="font-bold text-xl text-base-content flex-1 me-2 min-w-0 wrap-break-word">
-        {{ referenceLabel }}
-      </span>
-      <button
-        type="button"
-        class="btn btn-circle btn-xl transition-transform duration-200 hover:scale-110 active:scale-95"
-        aria-label="Fechar seleção"
-        @click="emit('clear')"
-      >
-        <Icon icon="close" :size="20" />
-      </button>
-    </div>
+  <div :class="panelClasses">
+    <BibleSelectedVersesActionModal
+      ref="actionModalRef"
+      @close="handleModalClose"
+    >
+      <component
+        v-if="activeView"
+        :is="activeView"
+        in-modal
+        class="flex flex-col flex-1 min-h-0 h-full overflow-hidden"
+        @back="handleCloseView"
+      />
+    </BibleSelectedVersesActionModal>
 
-    <!-- Marking -->
-    <div class="stagger-item stagger-2 mb-4">
-      <h3 class="text-sm font-semibold text-base-content/70 mb-2">
-        Marcação
-      </h3>
-      <div class="flex gap-2 overflow-x-auto overflow-y-hidden py-2 px-0.5 lg:flex-wrap lg:overflow-visible">
+    <component
+      v-if="showActionInPanel"
+      :is="activeView"
+      :in-modal="false"
+      class="flex-1 min-h-0 flex flex-col overflow-hidden"
+      @back="handleCloseView"
+    />
+
+    <template v-if="showSelectionContent">
+      <!-- Header -->
+      <div class="stagger-item stagger-1 flex justify-between items-center mb-2 shrink-0">
+        <span class="font-bold text-xl text-base-content flex-1 me-2 min-w-0 wrap-break-word">
+          {{ referenceLabel }}
+        </span>
         <button
-          v-for="color in allColors"
-          :key="color"
           type="button"
-          class="relative w-10 h-10 shrink-0 rounded-full flex items-center justify-center overflow-hidden cursor-pointer border-2 transition-all duration-200 ease-out hover:scale-110 active:scale-95"
-          :class="[
-            isColorActive(color)
-              ? 'border-base-content/40 ring-2 ring-base-content/20 ring-inset'
-              : 'border-transparent hover:border-base-content/30',
-          ]"
-          :style="{
-            backgroundColor: isValidHexColor(color) ? color : '#94a3b8',
-          }"
-          :aria-label="
-            isColorActive(color)
-              ? `Remover marcação ${color}`
-              : `Aplicar marcação ${color}`
-          "
-          @click="handleColorClick(color)"
+          class="btn btn-circle btn-xl transition-transform duration-200 hover:scale-110 active:scale-95"
+          aria-label="Fechar seleção"
+          @click="emit('clear')"
         >
-          <Transition name="marker-fade">
-            <span
-              v-if="isColorActive(color)"
-              class="absolute inset-0 flex items-center justify-center bg-black/25 transition-opacity duration-200"
-            >
-              <Icon
-                icon="close"
-                :size="16"
-                class="text-white drop-shadow-sm"
-              />
-            </span>
-          </Transition>
+          <Icon icon="close" :size="20" />
         </button>
       </div>
-    </div>
 
-    <!-- Copy button -->
-    <div class="stagger-item stagger-3 mb-5">
-      <button
-        type="button"
-        class="btn btn-outline btn-sm gap-2 transition-all duration-200"
-        :class="{ 'btn-success': copySuccess }"
-        @click="handleCopy"
-      >
-        <Icon icon="copy" :size="18" />
-        {{ copySuccess ? 'Copiado' : 'Copiar' }}
-      </button>
-    </div>
+      <!-- Marking -->
+      <div class="stagger-item stagger-2 mb-4">
+        <h3 class="text-sm font-semibold text-base-content/70 mb-2">
+          Marcação
+        </h3>
+        <div class="flex gap-2 overflow-x-auto overflow-y-hidden py-2 px-0.5 lg:flex-wrap lg:overflow-visible">
+          <button
+            v-for="color in allColors"
+            :key="color"
+            type="button"
+            class="relative w-10 h-10 shrink-0 rounded-full flex items-center justify-center overflow-hidden cursor-pointer border-2 transition-all duration-200 ease-out hover:scale-110 active:scale-95"
+            :class="[
+              isColorActive(color)
+                ? 'border-base-content/40 ring-2 ring-base-content/20 ring-inset'
+                : 'border-transparent hover:border-base-content/30',
+            ]"
+            :style="{
+              backgroundColor: isValidHexColor(color) ? color : '#94a3b8',
+            }"
+            :aria-label="
+              isColorActive(color)
+                ? `Remover marcação ${color}`
+                : `Aplicar marcação ${color}`
+            "
+            @click="handleColorClick(color)"
+          >
+            <Transition name="marker-fade">
+              <span
+                v-if="isColorActive(color)"
+                class="absolute inset-0 flex items-center justify-center bg-black/25 transition-opacity duration-200"
+              >
+                <Icon
+                  icon="close"
+                  :size="16"
+                  class="text-white drop-shadow-sm"
+                />
+              </span>
+            </Transition>
+          </button>
+        </div>
+      </div>
 
-    <!-- Clear selection -->
-    <button
-      type="button"
-      class="stagger-item stagger-4 btn btn-outline w-full gap-1 max-lg:hidden transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
-      @click="emit('clear')"
-    >
-      <Icon icon="broom" :size="18" />
-      Limpar seleção
-    </button>
+      <!-- Action buttons -->
+      <div class="stagger-item stagger-3 mb-5">
+        <BibleSelectedVersesActionButtons
+          :actions="actionButtons"
+          :copy-success="copySuccess"
+          @open-view="handleOpenView"
+        />
+      </div>
+    </template>
   </div>
 </template>
 
@@ -161,7 +233,6 @@ const handleColorClick = (color: string) => {
 .selected-verses-panel.selected-verses-enter-active .stagger-1 { animation-delay: 0.05s; }
 .selected-verses-panel.selected-verses-enter-active .stagger-2 { animation-delay: 0.12s; }
 .selected-verses-panel.selected-verses-enter-active .stagger-3 { animation-delay: 0.19s; }
-.selected-verses-panel.selected-verses-enter-active .stagger-4 { animation-delay: 0.26s; }
 
 @keyframes selected-verses-fade-in {
   from {
