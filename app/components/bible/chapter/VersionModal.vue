@@ -9,30 +9,26 @@ const emit = defineEmits<{
 const versionStore = useVersionStore()
 
 const versionSearch = ref('')
-const dialogRef = useTemplateRef<HTMLDialogElement>('dialogRef')
+const modalRef = useModalRef('modalRef')
 
 const filteredVersions = computed(() => {
   if (!versionSearch.value) return versionStore.versions
 
   const searchValue = normalizeString(versionSearch.value)
 
-  return versionStore.versions.filter(v => 
-    normalizeString(v.abbreviation).includes(searchValue) || 
+  return versionStore.versions.filter(v =>
+    normalizeString(v.abbreviation).includes(searchValue) ||
     normalizeString(v.name).includes(searchValue)
   )
 })
 
 const open = () => {
-  dialogRef.value?.showModal()
-}
-
-const close = () => {
-  dialogRef.value?.close()
+  modalRef.value?.open()
 }
 
 const selectVersion = (version: Version) => {
   emit('select', version)
-  close()
+  modalRef.value?.close()
 }
 
 defineExpose({
@@ -41,60 +37,42 @@ defineExpose({
 </script>
 
 <template>
-  <dialog
-    ref="dialogRef"
-    class="modal modal-bottom sm:modal-middle"
-    aria-labelledby="version-modal-title"
-    @click.self="close"
+  <SharedModal
+    ref="modalRef"
+    title="Selecionar Versão"
+    title-id="version-modal-title"
+    close-aria-label="Fechar modal de seleção de versão"
   >
-    <div class="modal-box max-w-2xl sm:rounded-lg max-sm:max-w-full max-sm:w-full max-sm:h-[calc(100dvh-4rem)] max-sm:mb-0 max-sm:mt-16 max-sm:rounded-b-none max-sm:flex max-sm:flex-col">
-      <!-- Header with close button -->
-      <div class="flex items-center justify-between mb-4 shrink-0">
-        <h3 id="version-modal-title" class="font-bold text-lg">
-          Selecionar Versão
-        </h3>
-        <button 
-          class="btn btn-sm btn-ghost btn-circle"
-          aria-label="Fechar modal de seleção de versão"
-          @click="close"
-        >
-          <Icon icon="close" :size="20" />
-          <span class="sr-only">Fechar</span>
-        </button>
-      </div>
-      
-      <!-- Search input -->
-      <div class="mb-4 shrink-0">
-        <label class="input w-full">
-          <Icon icon="search" :size="25" />
-          <input
-            v-model="versionSearch"
-            type="search"
-            class="search-input text-base-content"
-            placeholder="Buscar versão..."
-          />
-        </label>
-      </div>
-      
-      <!-- List of Versions -->
-      <div class="space-y-2 overflow-y-auto flex-1 sm:max-h-96">
-        <button
-          v-for="version in filteredVersions"
-          :key="version.id"
-          class="w-full text-left p-3 rounded-lg transition-colors flex items-center gap-3 border border-base-300 cursor-pointer hover:bg-base-200"
-          :class="{
-            'bg-primary/10 border-primary': versionStore.currentVersion?.id === version.id
-          }"
-          @click="selectVersion(version)"
-        >
-          <div class="flex-1">
-            <div class="font-semibold">{{ version.abbreviation }}</div>
-            <div class="text-sm text-base-content/70">{{ version.name }}</div>
-          </div>
-          <Icon icon="chevron_right" :size="20" class="text-base-content/40 self-center" />
-        </button>
-      </div>
+    <!-- Search input -->
+    <div class="mb-4 shrink-0">
+      <label class="input w-full">
+        <Icon icon="search" :size="25" />
+        <input
+          v-model="versionSearch"
+          type="search"
+          class="search-input text-base-content"
+          placeholder="Buscar versão..."
+        />
+      </label>
     </div>
-  </dialog>
-</template>
 
+    <!-- List of Versions -->
+    <div class="space-y-2 overflow-y-auto flex-1 sm:max-h-96">
+      <button
+        v-for="version in filteredVersions"
+        :key="version.id"
+        class="w-full text-left p-3 rounded-lg transition-colors flex items-center gap-3 border border-base-300 cursor-pointer hover:bg-base-200"
+        :class="{
+          'bg-primary/10 border-primary': versionStore.currentVersion?.id === version.id
+        }"
+        @click="selectVersion(version)"
+      >
+        <div class="flex-1">
+          <div class="font-semibold">{{ version.abbreviation }}</div>
+          <div class="text-sm text-base-content/70">{{ version.name }}</div>
+        </div>
+        <Icon icon="chevron_right" :size="20" class="text-base-content/40 self-center" />
+      </button>
+    </div>
+  </SharedModal>
+</template>
