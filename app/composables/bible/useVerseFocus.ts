@@ -28,6 +28,21 @@ export const useVerseFocus = (
     if (verseNumber.value) onClearFocus?.()
   }
 
+  const focusVerseByNumber = (targetVerseNumber: number, shouldScrollIntoVerse = true) => {
+    if (!containerRef.value) return
+
+    const verseElement = containerRef.value.querySelector(`#v${targetVerseNumber}`)
+    if (!verseElement) return
+
+    focusedVerseNumber.value = targetVerseNumber
+
+    if (!shouldScrollIntoVerse) return
+
+    isScrollingToVerse = true
+    verseElement.scrollIntoView({ behavior: 'smooth' })
+    resetScrollTimeout()
+  }
+
   const focusVerse = () => {
     if (!verseNumber.value || !containerRef.value) return clearFocus()
 
@@ -38,13 +53,7 @@ export const useVerseFocus = (
       return clearFocus()
     }
 
-    const verseElement = container.querySelector(`#v${verseNumber.value}`)
-    if (!verseElement) return
-
-    isScrollingToVerse = true
-    focusedVerseNumber.value = verseNumber.value
-    verseElement.scrollIntoView({ behavior: 'smooth' })
-    resetScrollTimeout()
+    focusVerseByNumber(verseNumber.value)
   }
 
   const handleVerseFocus = () => {
@@ -64,6 +73,7 @@ export const useVerseFocus = (
     overlayHeight,
     handleScroll,
     handleVerseFocus,
+    focusVerseByNumber,
     clearFocus
   }
 }
