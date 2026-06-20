@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { BookAbbreviationType } from '~/utils/bible/book'
 import type { BookWithChapters } from '~/types/book/Book.type'
-import { normalizeString } from '~/utils/helpers'
+import { matchesBookSearchPrefix } from '~/utils/bible/bookSearch'
 import { useNavigateToBible } from '~/composables/useNavigateToBible'
 
 const { goToChapter } = useNavigateToBible()
@@ -40,10 +40,8 @@ const selectedChapterVerses = computed(() => {
 const filteredBooks = computed(() => {
   if (!bookSearch.value) return []
 
-  const normalizedSearch = normalizeString(bookSearch.value)
-
   return versionStore.currentVersionBooks
-    .filter(book => normalizeString(book.name).startsWith(normalizedSearch))
+    .filter(book => matchesBookSearchPrefix(book.name, bookSearch.value))
     .slice(0, 10)
 })
 
@@ -184,11 +182,8 @@ const handleBookInput = () => {
 
   if(!selectedBookData.value) return
 
-  const normalizedInput = normalizeString(bookSearch.value)
-  const normalizedBookName = normalizeString(selectedBookData.value.name)
-
   // If it no longer matches, clears the selection
-  if (!normalizedBookName.startsWith(normalizedInput)) {
+  if (!matchesBookSearchPrefix(selectedBookData.value.name, bookSearch.value)) {
     clearBookSelection()
   }
 }

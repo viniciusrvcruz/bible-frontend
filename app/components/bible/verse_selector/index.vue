@@ -2,7 +2,7 @@
 import type { BookAbbreviationType } from '~/utils/bible/book'
 import type { ChapterSelection } from '~/types/chapter/Chapter.type'
 import type { VerseSelection } from '~/types/verse/Verse.type'
-import { normalizeString } from '~/utils/helpers'
+import { matchesBookSearchIncludes } from '~/utils/bible/bookSearch'
 
 const versionStore = useVersionStore()
 
@@ -44,10 +44,10 @@ const selectedChapterVerses = computed(() => {
 })
 
 const filteredBooks = computed(() => {
-  const normalizedSearch = normalizeString(search.value)
+  if (!search.value) return versionStore.currentVersionBooks
 
   return versionStore.currentVersionBooks
-    .filter(book => normalizeString(book.name).includes(normalizedSearch))
+    .filter(book => matchesBookSearchIncludes(book.name, search.value))
 })
 
 const handleSearchInput = (e: Event) => {
