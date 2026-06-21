@@ -40,22 +40,22 @@ const supportModal = useSupportModal()
           <div class="card bg-base-100 shadow-sm">
             <div class="card-body">
               <h3 class="card-title text-lg">
-                <Icon icon="compare" :size="20" />
-                Comparar Versões
+                <Icon icon="book_marked" :size="20" />
+                Referências clicáveis
               </h3>
               <p class="text-sm text-base-content/70">
-                Compare o mesmo versículo ou capítulo em diferentes versões da Bíblia lado a lado.
+                Nas notas de referência dos versículos, toque em uma referência bíblica e seja levado direto ao texto indicado.
               </p>
             </div>
           </div>
           <div class="card bg-base-100 shadow-sm">
             <div class="card-body">
               <h3 class="card-title text-lg">
-                <Icon icon="copy" :size="20" />
-                Copiar Versículos
+                <Icon icon="user" :size="20" />
+                Fazer login
               </h3>
               <p class="text-sm text-base-content/70">
-                Copie versículos selecionados com formatação personalizada para compartilhar facilmente.
+                Em breve você poderá acessar recursos personalizados com sua conta, conforme forem lançados nas próximas atualizações.
               </p>
             </div>
           </div>

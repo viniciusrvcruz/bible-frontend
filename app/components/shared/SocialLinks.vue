@@ -12,22 +12,21 @@ defineProps<{
       target="_blank"
       rel="noopener noreferrer"
       class="inline-flex items-center gap-2 text-inherit underline hover:text-primary hover:opacity-80 transition-colors"
-      title="Repositório do Projeto no GitHub"
+      title="Repositório do Frontend no GitHub"
     >
       <Icon icon="github" :size="iconSize || 20" />
-      <span>Repositório</span>
+      <span>Frontend</span>
     </a>
     <span v-if="!removeSeparators" class="text-base-content/40">•</span>
     <a
-      href="https://www.linkedin.com/in/viniciuscruz7"
+      href="https://github.com/viniciusrvcruz/bibleasy-backend"
       target="_blank"
       rel="noopener noreferrer"
       class="inline-flex items-center gap-2 text-inherit underline hover:text-primary hover:opacity-80 transition-colors"
-      title="LinkedIn"
+      title="Repositório do Backend no GitHub"
     >
-      <Icon icon="linkedin" :size="iconSize || 20" />
-      <span>Vinicius Cruz</span>
+      <Icon icon="github" :size="iconSize || 20" />
+      <span>Backend</span>
     </a>
   </div>
 </template>
-
