@@ -101,11 +101,11 @@ html {
  * Disable animations when the daisyui modal is open because
  * it's causing performance issues on mobile.
  */
-:root:has(.modal[open]),
+/* :root:has(.modal[open]),
 :root:has(.modal.modal-open),
 :root:has(.modal:target),
 :root:has(.modal-toggle:checked + .modal) {
   animation: none !important;
   animation-timeline: auto !important;
   --page-scroll-transition: none;
-}
+} */
