@@ -242,7 +242,7 @@ watch(visibleVersions, loadVisibleVersions, { immediate: true })
           v-else-if="getVersionState(version.id)?.status === 'error'"
           class="border-s-2 border-base-content/15 ps-4 text-sm text-base-content/70"
         >
-          Não foi possível carregar esta versão.
+          Este capítulo não está disponível nesta versão.
         </div>
 
         <template v-else-if="getVersionState(version.id)?.status === 'loaded'">
