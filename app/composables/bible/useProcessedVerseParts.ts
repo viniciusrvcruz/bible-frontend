@@ -61,7 +61,7 @@ export function useProcessedVerseParts(
   references: MaybeRefOrGetter<VerseReference[] | undefined>,
   titles?: MaybeRefOrGetter<VerseTitle[] | undefined>
 ) {
-  const processedText = computed<ProcessedPart[]>(() => {
+  const result = computed(() => {
     const textValue = toValue(text)
     const refs = toValue(references)
     const titlesList = toValue(titles)
@@ -94,8 +94,24 @@ export function useProcessedVerseParts(
       parts.push(createTextPart(textValue.slice(lastIndex)))
     }
 
-    return parts
+    // Count of trailing line breaks
+    let trailingLineBreaksCount = 0
+    const lastPart = parts[parts.length - 1]
+
+    if (lastPart?.type === 'text') {
+      const match = lastPart.content.match(/\n+$/)
+
+      if (match) {
+        trailingLineBreaksCount = match[0].length
+        lastPart.content = lastPart.content.slice(0, -trailingLineBreaksCount)
+      }
+    }
+
+    return { parts, trailingLineBreaksCount }
   })
 
-  return { processedText }
+  const processedText = computed(() => result.value.parts)
+  const trailingLineBreaksCount = computed(() => result.value.trailingLineBreaksCount)
+
+  return { processedText, trailingLineBreaksCount }
 }

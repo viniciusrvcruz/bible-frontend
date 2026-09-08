@@ -21,7 +21,7 @@ const contrastTextClass = computed(() =>
 )
 
 // Processes verse text: {{slug}} → reference, [[slug]] → title
-const { processedText } = useProcessedVerseParts(
+const { processedText, trailingLineBreaksCount } = useProcessedVerseParts(
   () => props.verse.text,
   () => props.verse.references,
   () => props.verse.titles
@@ -39,45 +39,57 @@ const onClick = (event: MouseEvent) => {
 </script>
 
 <template>
-  <div
-    class="p-1 inline leading-[1.9] indent-0 whitespace-pre-line wrap-break-word cursor-pointer transition-colors duration-300 ease-out"
-    :class="[
-      {
-        'relative bg-base-100 rounded shadow-lg z-1': isFocused,
-        'border-b-3 border-dotted': isSelected,
-        'rounded': !!highlightColor,
-      },
-      contrastTextClass
-     ]"
-    :style="highlightColor ? { backgroundColor: highlightColor } : undefined"
-    @click="onClick"
-  >
-    <span
-      class="text-[0.8em] align-super leading-0 font-bold me-2 transition-colors duration-300 ease-out"
-      :class="highlightColor ? contrastTextClass : 'text-base-content/50'"
-    >
-      {{ verse.number }}
-    </span>
+  <div class="inline">
     <div
-      class="inline leading-[1.9] transition-colors duration-300 ease-out"
-      :class="contrastTextClass"
+      class="verse-content p-1 inline leading-[1.9] whitespace-pre-line wrap-break-word cursor-pointer transition-colors duration-300 ease-out"
+      :class="[
+        {
+          'relative bg-base-100 rounded shadow-lg z-1': isFocused,
+          'border-b-3 border-dotted': isSelected,
+          'rounded': !!highlightColor,
+        },
+        contrastTextClass
+      ]"
+      :style="highlightColor ? { backgroundColor: highlightColor } : undefined"
+      @click="onClick"
     >
-      <template v-for="(part, index) in processedText" :key="index">
-        <template v-if="part.type === 'text'">
-          {{ part.content }}
+      <span
+        class="text-[0.8em] align-super leading-0 font-bold me-2 transition-colors duration-300 ease-out"
+        :class="highlightColor ? contrastTextClass : 'text-base-content/50'"
+      >
+        {{ verse.number }}
+      </span>
+      <div
+        class="inline leading-[1.9] transition-colors duration-300 ease-out"
+        :class="contrastTextClass"
+      >
+        <template v-for="(part, index) in processedText" :key="index">
+          <template v-if="part.type === 'text'">
+            {{ part.content }}
+          </template>
+          <BibleChapterTitle
+            v-else-if="part.type === 'title'"
+            :title="part.title"
+            :references="verse.references"
+            class="text-base-content"
+          />
+          <BibleChapterVerseReference
+            v-else-if="part.type === 'reference'"
+            :reference="part.reference"
+            :verse-number="verse.number"
+          />
         </template>
-        <BibleChapterTitle
-          v-else-if="part.type === 'title'"
-          :title="part.title"
-          :references="verse.references"
-          class="text-base-content"
-        />
-        <BibleChapterVerseReference
-          v-else-if="part.type === 'reference'"
-          :reference="part.reference"
-          :verse-number="verse.number"
-        />
-      </template>
+      </div>
     </div>
+    <br v-for="lineBreak in trailingLineBreaksCount" :key="lineBreak">
   </div>
 </template>
+
+<style scoped>
+.inline:first-child > .verse-content, /* 1. first verse of the entire list */
+h2 + .inline > .verse-content, /* 2. previous element is a h2 */
+.inline:has(> br:last-child) + .inline > .verse-content /* 3. previous element is a wrapper with a <br> as the last child */
+{
+  padding-inline-start: .5rem;
+}
+</style>
