@@ -18,7 +18,7 @@ const { processedText } = useProcessedVerseParts(
 <template>
   <h2
     :class="[
-      `${title.position !== VerseTitlePositionEnum.CUSTOM ? 'mb-[1em]' : 'mb-0'}`,
+      `${title.position !== VerseTitlePositionEnum.CUSTOM ? 'mb-[1em] mt-[1.3em]' : 'mb-0'}`,
       {'text-[1.15em] font-bold': title.type === VerseTitleTypeEnum.SECTION},
       {'text-[0.850em] font-bold italic': title.type === VerseTitleTypeEnum.REFERENCE},
     ]"
