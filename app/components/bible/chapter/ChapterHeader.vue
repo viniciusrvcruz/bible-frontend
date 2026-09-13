@@ -55,7 +55,7 @@ watch(isFullscreen, (newValue, oldValue) => {
     </div>
   </div>
 
-  <div v-else class="navbar py-2.5 px-5 bg-base-100 shadow-sm sticky top-0 items-center z-2 lg:px-10">
+  <div v-else class="navbar py-2.5 px-5 bg-base-100 shadow-sm sticky top-0 items-center z-2 hide-on-scroll-chapter-header transition-transform duration-300 ease-out motion-reduce:transition-none lg:px-10">
     <span class="hidden font-bold text-xl lg:inline">
       {{ bookName }} {{ chapterNumber }}
     </span>

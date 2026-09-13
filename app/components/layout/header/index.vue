@@ -15,7 +15,7 @@ const closeDrawer = () => {
 </script>
 
 <template>
-  <div class="drawer sticky top-0 z-20">
+  <div class="drawer sticky top-0 z-20 hide-on-scroll-app-header transition-transform duration-300 ease-out motion-reduce:transition-none">
     <input
       id="drawer"
       type="checkbox"

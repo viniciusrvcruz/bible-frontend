@@ -6,6 +6,98 @@
 
 :root {
   --h-header: 4rem;
+  --h-header-offset: var(--h-header);
+}
+
+/*
+ * Reader hide-on-scroll.
+ *
+ * reader-layout-expanded and reader-chrome-hidden are toggled together by
+ * useHideOnScroll (expanded ⇔ chrome hidden). Layout expansion collapses the
+ * 4rem app-header gap so the chapter column fills the viewport.
+ */
+html.reader-layout-expanded {
+  --h-header-offset: 0px;
+}
+
+html.reader-layout-expanded .hide-on-scroll-app-header {
+  margin-bottom: calc(-1 * var(--h-header));
+}
+
+html.reader-chrome-hidden .hide-on-scroll-app-header,
+html.reader-chrome-hidden .hide-on-scroll-chapter-header {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+/* Bottom nav only hides on small screens; desktop keeps prev/next visible. */
+@media (max-width: 1023px) {
+  html.reader-chrome-hidden .hide-on-scroll-nav {
+    transform: translateY(100%);
+    pointer-events: none;
+  }
+}
+
+/*
+ * Compact footer sits in normal column flow below the text scroller.
+ * Grid 0fr/1fr + overflow/max-height keep it fully clipped when collapsed
+ * (avoids a 1px border peek at the bottom of the page).
+ */
+.hide-on-scroll-compact-footer-slot {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  max-height: 0;
+  transition:
+    grid-template-rows 300ms ease-out,
+    max-height 300ms ease-out;
+}
+
+.hide-on-scroll-compact-footer-slot > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (max-width: 1023px) {
+  html.reader-chrome-hidden .hide-on-scroll-compact-footer-slot {
+    grid-template-rows: 1fr;
+    max-height: 4rem;
+  }
+}
+
+/*
+ * Desktop mini title while chrome is hidden — sticky inside the chapter
+ * scroller (same idea as ChapterHeader), replacing the full chapter navbar.
+ */
+.hide-on-scroll-compact-header {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  html.reader-chrome-hidden .hide-on-scroll-compact-header {
+    display: block;
+  }
+
+  html.reader-chrome-hidden .hide-on-scroll-chapter-header {
+    transform: none;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+    overflow: hidden;
+    border: none;
+    box-shadow: none;
+    pointer-events: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hide-on-scroll-app-header,
+  .hide-on-scroll-chapter-header,
+  .hide-on-scroll-nav,
+  .hide-on-scroll-compact-footer-slot {
+    transition: none;
+  }
 }
 
 [data-theme="black"],
@@ -34,11 +126,11 @@ html {
 }
 
 @utility top-header {
-  top: var(--h-header);
+  top: var(--h-header-offset);
 }
 
 @utility h-screen-header {
-  height: calc(100dvh - var(--h-header));
+  height: calc(100dvh - var(--h-header-offset));
 }
 
 /* color-scheme dynamically based on the theme (data-theme) */
